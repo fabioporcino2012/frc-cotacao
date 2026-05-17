@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Florida Rental Car 🏎️</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  :root{
+    --bg:#111b21;--header:#1f2c34;--bubble-in:#202c33;--bubble-out:#005c4b;
+    --green:#25d366;--text:#e9edef;--muted:#8696a0;--border:#2a3942;--red:#7D1202;
+  }
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;
+    background:var(--bg);height:100dvh;display:flex;flex-direction:column;
+    max-width:430px;margin:0 auto;position:relative;overflow:hidden;}
+
+  /* HEADER */
+  .hdr{background:var(--header);padding:10px 14px;display:flex;align-items:center;
+    gap:10px;border-bottom:1px solid var(--border);z-index:20;flex-shrink:0;}
+  .hdr-av{width:42px;height:42px;border-radius:50%;background:var(--red);
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;color:#fff;font-weight:800;flex-shrink:0;}
+  .hdr-inf{flex:1;}
+  .hdr-name{color:var(--text);font-size:16px;font-weight:600;line-height:1.2;}
+  .hdr-status{color:var(--green);font-size:11.5px;}
+  .hdr-ic{color:var(--muted);font-size:22px;display:flex;gap:18px;cursor:pointer;}
+
+  /* CHAT */
+  .chat{flex:1;overflow-y:auto;padding:10px 8px 72px;scroll-behavior:smooth;}
+  .chat::-webkit-scrollbar{display:none;}
+
+  .date-lbl{text-align:center;margin:10px 0;}
+  .date-lbl span{background:var(--header);color:var(--muted);
+    font-size:12px;padding:5px 14px;border-radius:8px;}
+
+  /* BUBBLES */
+  .msg{display:flex;margin:2px 0;animation:pop .25s ease;}
+  @keyframes pop{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:none}}
+  .msg.in{justify-content:flex-start;}
+  .msg.out{justify-content:flex-end;}
+  .bbl{max-width:80%;padding:8px 10px 6px;border-radius:7.5px;
+    font-size:14.5px;line-height:1.45;position:relative;word-break:break-word;}
+  .in .bbl{background:var(--bubble-in);color:var(--text);border-top-left-radius:0;}
+  .out .bbl{background:var(--bubble-out);color:var(--text);border-top-right-radius:0;}
+  .bbl b{font-weight:600;}
+  .t{font-size:10.5px;color:var(--muted);float:right;margin-left:8px;margin-top:3px;}
+
+  /* TYPING */
+  .typing{display:flex;align-items:center;gap:4px;padding:12px 14px;
+    background:var(--bubble-in);border-radius:7.5px;border-top-left-radius:0;
+    width:56px;margin:2px 0;}
+  .dot{width:7px;height:7px;background:var(--muted);border-radius:50%;
+    animation:bounce 1.3s infinite ease-in-out;}
+  .dot:nth-child(2){animation-delay:.2s;}
+  .dot:nth-child(3){animation-delay:.4s;}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+  /* CAR CARD */
+  .car-wrap{max-width:82%;margin:3px 0;}
+  .car-card{background:var(--bubble-in);border-radius:10px;overflow:hidden;
+    border:1.5px solid var(--border);cursor:pointer;transition:.15s;}
+  .car-card:hover,.car-card:active{border-color:var(--green);}
+  .car-card.rec{border-color:var(--green);}
+  .car-badge{background:var(--green);color:#111;font-size:11px;font-weight:800;
+    padding:4px 10px;letter-spacing:.5px;}
+  .car-img{width:100%;height:130px;object-fit:cover;background:#1a2430;
+    display:flex;align-items:center;justify-content:center;font-size:48px;}
+  .car-img img{width:100%;height:100%;object-fit:cover;}
+  .car-body{padding:10px 12px 12px;}
+  .car-name{color:var(--text);font-size:15px;font-weight:700;}
+  .car-icons{color:var(--muted);font-size:12px;margin-top:3px;}
+  .car-price{color:var(--green);font-size:20px;font-weight:800;margin-top:6px;}
+  .car-price span{font-size:12px;color:var(--muted);font-weight:400;}
+  .car-total{color:var(--muted);font-size:12px;margin-top:2px;}
+  .car-btn{display:block;background:var(--green);color:#111;font-weight:700;
+    font-size:14px;text-align:center;padding:10px;border-radius:8px;
+    margin:10px 12px 12px;border:none;cursor:pointer;width:calc(100% - 24px);}
+  .car-btn:active{opacity:.85;}
+
+  /* OPTIONS */
+  .opts{display:flex;flex-wrap:wrap;gap:8px;padding:6px 8px;}
+  .opt{background:var(--header);border:1.5px solid var(--green);color:var(--green);
+    padding:9px 16px;border-radius:20px;font-size:14px;cursor:pointer;
+    font-weight:500;transition:.15s;}
+  .opt:active,.opt.sel{background:var(--green);color:#111;}
+  .opt.full{width:100%;text-align:center;border-radius:10px;padding:13px;}
+  .opt.bold{font-weight:800;font-size:15px;}
+  .opt.wa{background:var(--green);color:#fff;border:none;font-weight:800;}
+
+  /* FORM */
+  .frm{background:#1a2732;border-radius:10px;padding:14px;
+    max-width:88%;margin:4px 0;}
+  .frm label{color:var(--muted);font-size:12px;display:block;margin-bottom:4px;}
+  .frm input,.frm select{width:100%;background:#2a3942;border:1.5px solid #3a4a56;
+    border-radius:8px;padding:11px 14px;color:var(--text);font-size:15px;
+    outline:none;margin-bottom:10px;font-family:inherit;-webkit-appearance:none;}
+  .frm input:focus,.frm select:focus{border-color:var(--green);}
+  .frm input::placeholder{color:var(--muted);}
+  .frm .err{border-color:#ef4444!important;}
+  .frm-btn{width:100%;background:var(--green);color:#111;border:none;
+    border-radius:8px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;}
+  .frm-btn:active{opacity:.85;}
+
+  /* PAYMENT */
+  .pay-card{background:#0d1f14;border:2px solid var(--green);border-radius:14px;
+    padding:18px;max-width:88%;margin:4px 0;}
+  .pay-lbl{color:var(--green);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;}
+  .pay-total{color:var(--text);font-size:30px;font-weight:900;margin:4px 0;}
+  .pay-details{color:var(--muted);font-size:12.5px;line-height:1.8;}
+  .pay-btn{display:block;width:100%;background:var(--green);color:#111;
+    font-weight:800;font-size:16px;text-align:center;padding:15px;
+    border-radius:10px;margin-top:16px;border:none;cursor:pointer;}
+  .pay-btn:active{opacity:.85;}
+  .pay-security{color:var(--muted);font-size:11px;text-align:center;margin-top:8px;}
+
+  /* AI badge */
+  .ai-b{display:inline-flex;align-items:center;gap:4px;
+    background:#0d1b2a;border:1px solid #3b82f6;color:#60a5fa;
+    font-size:10px;padding:2px 7px;border-radius:10px;margin-bottom:5px;}
+
+  /* INPUT BAR */
+  .bar{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;
+    background:var(--header);padding:9px 12px;display:flex;align-items:flex-end;
+    gap:10px;border-top:1px solid var(--border);z-index:20;}
+  .bar textarea{flex:1;background:#2a3942;border:none;border-radius:21px;
+    padding:10px 16px;color:var(--text);font-size:15px;outline:none;
+    resize:none;min-height:42px;max-height:100px;font-family:inherit;line-height:1.4;}
+  .bar textarea::placeholder{color:var(--muted);}
+  .bar .send{width:44px;height:44px;background:var(--green);border:none;
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;font-size:20px;}
+  .bar .send:active{opacity:.8;}
+
+  /* SPINNER */
+  .spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
+    border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-av">F</div>
+  <div class="hdr-inf">
+    <div class="hdr-name">Florida Rental Car 🏎️</div>
+    <div class="hdr-status">● online agora</div>
+  </div>
+  <div class="hdr-ic"><span>📞</span><span>⋮</span></div>
+</div>
+
+<div class="chat" id="chat"></div>
+
+<div class="bar">
+  <textarea id="inp" placeholder="Mensagem" rows="1"
+    oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+    onkeypress="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendUser();}"></textarea>
+  <button class="send" onclick="sendUser()">➤</button>
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────
+const EDGE = 'https://abjzskmxfcqsxcoybsdg.supabase.co/functions/v1';
+const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFianpza214ZmNxc3hjb3lic2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODUzMDEsImV4cCI6MjA4OTk2MTMwMX0.66vI8Aqm9bzi8K9YW-pHGhSWr5ufoG_9i6jei2m9kAA';
+const LOCAIS = {1:'Orlando - Aeroporto (MCO)',3:'Miami - Aeroporto (MIA)',4:'Fort Lauderdale (FLL)'};
+
+const chat = document.getElementById('chat');
+let ctx = {nome:'',phone:'',email:'',local_id:1,local_nome:'',pickup:'',retorno:'',dias:7,carro:null,cotacao_id:null};
+let aiHistory = [];
+let aiActive = false;
+let sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+
+// ─── HELPERS ──────────────────────────────────────────────────────────
+const now = () => { const d=new Date(); return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0'); }
+const scroll = () => setTimeout(() => chat.scrollTop = chat.scrollHeight, 80);
+
+function addMsg(html, type='in', delay=0) {
+  return new Promise(r => setTimeout(() => {
+    const d = document.createElement('div');
+    d.className = `msg ${type}`;
+    d.innerHTML = `<div class="bbl">${html}<span class="t">${now()}${type==='out'?' ✓✓':''}</span></div>`;
+    chat.appendChild(d); scroll(); r();
+  }, delay));
+}
+
+function showTyping(ms=1200) {
+  return new Promise(r => {
+    const d = document.createElement('div');
+    d.className = 'msg in'; d.id = 'typ';
+    d.innerHTML = '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+    chat.appendChild(d); scroll();
+    setTimeout(() => { document.getElementById('typ')?.remove(); r(); }, ms);
+  });
+}
+
+function addEl(el) { chat.appendChild(el); scroll(); }
+
+function makeOpts(btns) {
+  const d = document.createElement('div'); d.className = 'opts';
+  btns.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'opt' + (b.full?' full':'') + (b.bold?' bold':'') + (b.wa?' wa':'');
+    btn.textContent = b.label;
+    btn.onclick = () => { d.remove(); b.fn(); };
+    d.appendChild(btn);
+  });
+  return d;
+}
+
+// ─── FLOW ─────────────────────────────────────────────────────────────
+async function init() {
+  await addMsg('Olá! 👋 Bem-vindo à <b>Florida Rental Car</b>!');
+  await showTyping(800);
+  await addMsg('🏎️ Somos especialistas em aluguel de carros em <b>Orlando, Miami e Fort Lauderdale</b> com suporte 100% em português.<br><br>Como posso te ajudar hoje?');
+  addEl(makeOpts([
+    {label:'💰 Fazer uma cotação', fn: stepLead, full:true, bold:true},
+    {label:'❓ Tenho uma dúvida', fn: startAI},
+    {label:'🎁 Promoções', fn: showPromo},
+  ]));
+}
+
+// STEP 1 — Lead capture
+async function stepLead() {
+  await addMsg('💰 Quero fazer uma cotação', 'out');
+  await showTyping(900);
+  await addMsg('Ótimo! 😊 Para começar, me passa seus dados rapidinho — assim te envio a cotação por WhatsApp e e-mail também!');
+
+  const frm = document.createElement('div'); frm.className = 'frm';
+  frm.innerHTML = `
+    <label>Seu nome *</label>
+    <input id="f-nome" type="text" placeholder="Ex: João Silva" autocomplete="name"/>
+    <label>WhatsApp (com DDD) *</label>
+    <input id="f-fone" type="tel" placeholder="11 99999-0000" autocomplete="tel"/>
+    <label>E-mail (para receber o PDF)</label>
+    <input id="f-email" type="email" placeholder="joao@email.com" autocomplete="email"/>
+    <button class="frm-btn" id="btn-lead">Continuar →</button>
+  `;
+  addEl(frm);
+  document.getElementById('btn-lead').onclick = submitLead;
+}
+
+async function submitLead() {
+  const nome = document.getElementById('f-nome').value.trim();
+  const phone = document.getElementById('f-fone').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  if (!nome) { document.getElementById('f-nome').classList.add('err'); return; }
+  if (!phone || phone.replace(/\D/g,'').length < 8) { document.getElementById('f-fone').classList.add('err'); return; }
+
+  ctx.nome = nome; ctx.phone = phone.replace(/\D/g,''); ctx.email = email;
+
+  // Salvar lead em background
+  fetch(`${EDGE}/hq-step1-capture`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({name:nome, phone:ctx.phone, email, source:'chat_cotacao', attempt_uuid: sessionId})
+  }).catch(()=>{});
+
+  document.querySelector('.frm')?.remove();
+  await addMsg(`Meu nome é <b>${nome}</b> 📱 ${phone}`, 'out');
+  await showTyping(1000);
+  await addMsg(`Prazer, <b>${nome}</b>! 🙌 Agora me conta: para <b>quando</b> é a viagem e onde vai <b>retirar o carro</b>?`);
+  stepDatas();
+}
+
+// STEP 2 — Datas
+function stepDatas() {
+  const hoje = new Date();
+  const pickup = new Date(hoje); pickup.setDate(pickup.getDate()+14);
+  const ret = new Date(pickup); ret.setDate(ret.getDate()+7);
+  const fmt = d => d.toISOString().split('T')[0];
+
+  const frm = document.createElement('div'); frm.className = 'frm';
+  frm.innerHTML = `
+    <label>📍 Local de retirada</label>
+    <select id="f-local">
+      <option value="1">Orlando - Aeroporto (MCO)</option>
+      <option value="3">Miami - Aeroporto (MIA)</option>
+      <option value="4">Fort Lauderdale (FLL)</option>
+    </select>
+    <label>📅 Data de retirada *</label>
+    <input id="f-pickup" type="date" value="${fmt(pickup)}" min="${fmt(hoje)}"/>
+    <label>📅 Data de devolução *</label>
+    <input id="f-ret" type="date" value="${fmt(ret)}" min="${fmt(pickup)}"/>
+    <button class="frm-btn" id="btn-datas">🔍 Ver carros disponíveis</button>
+  `;
+  addEl(frm);
+  document.getElementById('btn-datas').onclick = submitDatas;
+}
+
+async function submitDatas() {
+  const localId = parseInt(document.getElementById('f-local').value);
+  const pickup = document.getElementById('f-pickup').value;
+  const ret = document.getElementById('f-ret').value;
+  if (!pickup || !ret) return;
+
+  const d1=new Date(pickup), d2=new Date(ret);
+  const dias = Math.round((d2-d1)/(1000*60*60*24));
+  if (dias < 1) { alert('Datas inválidas'); return; }
+
+  ctx.local_id = localId; ctx.local_nome = LOCAIS[localId];
+  ctx.pickup = pickup; ctx.retorno = ret; ctx.dias = dias;
+
+  document.querySelector('.frm')?.remove();
+  const pFmt = d1.toLocaleDateString('pt-BR');
+  const rFmt = d2.toLocaleDateString('pt-BR');
+
+  await addMsg(`📍 ${ctx.local_nome}<br>📅 ${pFmt} → ${rFmt} (${dias} dias)`, 'out');
+  await showTyping(600);
+  await addMsg('Buscando disponibilidade em tempo real... 🔍');
+  await showTyping(2000);
+
+  fetchCarros(pickup, ret, dias);
+}
+
+// STEP 3 — Carros
+async function fetchCarros(pickup, ret, dias) {
+  try {
+    const r = await fetch(`${EDGE}/hq-cotacao-engine?action=availability&pickup=${pickup}&return=${ret}`);
+    const data = await r.json();
+
+    const carros = (data.carros || []).filter(c => c.daily_usd > 0);
+
+    if (carros.length === 0) {
+      await addMsg('😕 Não encontrei carros disponíveis para essas datas. Tente outras datas ou fale com nossa equipe!');
+      addEl(makeOpts([{label:'💬 Falar com atendente', fn: ()=>window.open('https://wa.link/8x8bbz'), wa:true, full:true}]));
+      return;
+    }
+
+    await addMsg(`🎉 Encontrei <b>${carros.length} opções</b> disponíveis para você! Escolhe o que mais combina:`);
+
+    carros.forEach((car, i) => {
+      setTimeout(() => {
+        const wrap = document.createElement('div');
+        wrap.className = 'car-wrap msg in';
+        const totalBRL = (car.total_brl || car.daily_usd * dias * 5.8).toFixed(0);
+
+        wrap.innerHTML = `
+          <div class="car-card${car.recommended?' rec':''}" onclick="selecionarCarro(${JSON.stringify(JSON.stringify(car))})">
+            ${car.recommended ? '<div class="car-badge">⭐ MAIS ESCOLHIDO</div>' : ''}
+            <div class="car-img">
+              <img src="${car.thumb_url || car.image_url}" onerror="this.parentNode.innerHTML='🚗'" loading="lazy"/>
+            </div>
+            <div class="car-body">
+              <div class="car-name">${car.nome}</div>
+              <div class="car-icons">
+                ${car.seats?`👥 ${car.seats}  `:''}${car.bags?`💼 ${car.bags}  `:''}❄️  🚗
+              </div>
+              ${car.descricao ? `<div class="car-icons" style="margin-top:3px">${car.descricao.slice(0,80)}</div>` : ''}
+              <div class="car-price">$${car.daily_usd.toFixed(0)}<span>/dia</span></div>
+              <div class="car-total">Total ${dias} dias: <b style="color:var(--text)">$${car.total_usd.toFixed(0)} USD</b> · R$ ${totalBRL}</div>
+              <button class="car-btn">Quero este →</button>
+            </div>
+          </div>
+        `;
+        addEl(wrap);
+
+        if (i === carros.length - 1) {
+          setTimeout(async () => {
+            const aiWrap = document.createElement('div');
+            aiWrap.className = 'msg in';
+            aiWrap.innerHTML = `<div class="bbl"><div class="ai-b">🤖 IA</div><br>Dúvida sobre os carros? Pode me perguntar! Também consigo verificar se tem promoção especial para você 😊<span class="t">${now()}</span></div>`;
+            addEl(aiWrap);
+            aiActive = true;
+          }, 400);
+        }
+      }, i * 700);
+    });
+
+  } catch(e) {
+    console.error(e);
+    await addMsg('Encontrei uma dificuldade técnica. Que tal falar diretamente com nossa equipe? 😊');
+    addEl(makeOpts([{label:'💬 Falar com atendente', fn: ()=>window.open('https://wa.link/8x8bbz'), wa:true, full:true}]));
+  }
+}
+
+// STEP 4 — Selecionar carro
+async function selecionarCarro(carJson) {
+  const car = JSON.parse(carJson);
+  ctx.carro = car;
+
+  document.querySelectorAll('.car-card').forEach(c => c.style.opacity='.4');
+
+  await addMsg(`✅ Quero o <b>${car.nome}</b>!`, 'out');
+  await showTyping(1100);
+  await addMsg(`Excelente escolha! 🙌<br><br>📋 <b>Resumo da sua cotação:</b><br>🚗 ${car.nome}<br>📍 ${ctx.local_nome}<br>📅 ${new Date(ctx.pickup).toLocaleDateString('pt-BR')} → ${new Date(ctx.retorno).toLocaleDateString('pt-BR')}<br>⏱️ ${ctx.dias} dias<br>💵 <b>$${car.total_usd.toFixed(0)} USD</b> · R$ ${(car.total_brl||car.total_usd*5.8).toFixed(0)}<br>✅ KM ilimitado · Seguro incluso`);
+
+  // Salvar cotação
+  fetch(`${EDGE}/hq-cotacao-engine?action=salvar`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      session_id: sessionId, nome: ctx.nome, phone: ctx.phone, email: ctx.email,
+      local_id: ctx.local_id, local_nome: ctx.local_nome,
+      pickup_date: ctx.pickup, return_date: ctx.retorno, dias: ctx.dias,
+      vehicle_class_id: car.id, vehicle_nome: car.nome,
+      daily_usd: car.daily_usd, total_usd: car.total_usd,
+      total_brl: car.total_brl || car.total_usd * 5.8
+    })
+  }).then(r=>r.json()).then(d => { if(d.cotacao_id) ctx.cotacao_id = d.cotacao_id; });
+
+  await showTyping(800);
+  await addMsg('Como prefere prosseguir? 👇');
+
+  addEl(makeOpts([
+    {label:`💳 Pagar em USD ($${car.total_usd.toFixed(0)})`, fn: ()=>stepPagamento('usd'), full:true, bold:true},
+    {label:`🇧🇷 Pagar em BRL (R$ ${(car.total_brl||car.total_usd*5.8).toFixed(0)})`, fn: ()=>stepPagamento('brl'), full:true},
+    {label:'📄 Receber cotação por e-mail', fn: stepPDF},
+    {label:'💬 Falar com vendedor', fn: ()=>window.open('https://wa.link/8x8bbz'), wa:true, full:true},
+  ]));
+}
+
+// STEP 5 — Pagamento
+async function stepPagamento(moeda) {
+  await addMsg(`💳 Pagar em ${moeda.toUpperCase()}`, 'out');
+  await showTyping(500);
+  await addMsg('Gerando seu link seguro... 🔐 <span class="spin"></span>');
+
+  try {
+    const car = ctx.carro;
+    const totalUsd = car.total_usd;
+    const totalBrl = car.total_brl || totalUsd * 5.8;
+    const amount = moeda === 'usd' ? totalUsd : totalBrl;
+
+    const r = await fetch(`${EDGE}/hq-cotacao-payment`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        cotacao_id: ctx.cotacao_id, nome: ctx.nome, email: ctx.email,
+        phone: ctx.phone, vehicle_nome: car.nome, total_usd: totalUsd,
+        total_brl: totalBrl, dias: ctx.dias, moeda,
+        pickup_date: ctx.pickup, return_date: ctx.retorno, local_nome: ctx.local_nome
+      })
+    });
+    const data = await r.json();
+
+    if (!data.link) throw new Error('sem link');
+
+    // Remover spinner
+    document.querySelectorAll('.bbl').forEach(b => {
+      if(b.textContent.includes('Gerando')) b.innerHTML = '🔐 Link de pagamento gerado!<span class="t">'+now()+'</span>';
+    });
+
+    const card = document.createElement('div');
+    card.className = 'pay-card';
+    card.innerHTML = `
+      <div class="pay-lbl">🔐 Pagamento Seguro · Mercado Pago</div>
+      <div class="pay-total">${moeda==='usd'?'$'+totalUsd.toFixed(0):'R$ '+totalBrl.toFixed(0)}</div>
+      <div class="pay-details">
+        🚗 ${car.nome}<br>
+        📍 ${ctx.local_nome}<br>
+        📅 ${new Date(ctx.pickup).toLocaleDateString('pt-BR')} → ${new Date(ctx.retorno).toLocaleDateString('pt-BR')}<br>
+        ⏱️ ${ctx.dias} dias · ✅ KM ilimitado · Seguro incluso
+      </div>
+      <button class="pay-btn" onclick="window.open('${data.link}','_blank')">
+        ${moeda==='usd'?'💳 Pagar com cartão USD':'🇧🇷 Pagar via Pix ou Cartão BRL'}
+      </button>
+      <div class="pay-security">🔒 Pagamento 100% seguro · Mercado Pago</div>
+    `;
+    addEl(card);
+
+    await addMsg('✅ Após o pagamento, nossa equipe entra em contato em até <b>30 minutos</b> para confirmar sua reserva! 🏎️<br><br>Qualquer dúvida, pode me perguntar aqui 😊');
+
+  } catch(e) {
+    await addMsg('😕 Tive um problema técnico. Fale diretamente com nossa equipe!');
+    addEl(makeOpts([{label:'💬 Falar agora no WhatsApp', fn: ()=>window.open('https://wa.link/8x8bbz'), wa:true, full:true}]));
+  }
+}
+
+// STEP 5B — PDF
+async function stepPDF() {
+  await addMsg('📄 Quero receber a cotação por e-mail', 'out');
+  await showTyping(1200);
+  const car = ctx.carro;
+  await addMsg(`Cotação enviada para <b>${ctx.email||'seu e-mail'}</b> 📧<br><br>Nossa equipe também vai te chamar no <b>WhatsApp ${ctx.phone}</b> em breve! 😊<br><br>Posso te ajudar em mais alguma coisa?`);
+  addEl(makeOpts([
+    {label:'💬 Falar com vendedor agora', fn: ()=>window.open('https://wa.link/8x8bbz'), wa:true, full:true},
+    {label:'💳 Pagar agora e garantir', fn: ()=>stepPagamento('brl'), full:true, bold:true},
+  ]));
+}
+
+// PROMOS
+async function showPromo() {
+  await addMsg('🎁 Ver promoções', 'out');
+  await showTyping(800);
+  await addMsg('🔥 <b>Promoção ativa:</b> até 30% OFF em todas as categorias!<br><br>Para ver o preço com desconto, preciso das suas datas. Vamos cotar?');
+  addEl(makeOpts([{label:'✅ Sim, quero cotar agora!', fn: stepLead, full:true, bold:true}]));
+}
+
+// AI MODE
+async function startAI() {
+  aiActive = true;
+  await addMsg('❓ Tenho uma dúvida', 'out');
+  await showTyping(700);
+  await addMsg('<div class="ai-b">🤖 IA</div><br>Claro! Pode me perguntar tudo sobre nossos carros, preços, seguros, documentos... Estou aqui pra ajudar! 😊');
+}
+
+async function sendUser() {
+  const inp = document.getElementById('inp');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = ''; inp.style.height = 'auto';
+
+  await addMsg(text, 'out');
+  aiHistory.push({role:'user', content: text});
+
+  await showTyping(1000 + text.length * 15);
+
+  try {
+    const r = await fetch(`${EDGE}/hq-cotacao-ai`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        messages: aiHistory,
+        contexto: {
+          nome: ctx.nome, phone: ctx.phone, local_nome: ctx.local_nome,
+          pickup: ctx.pickup, retorno: ctx.retorno, dias: ctx.dias,
+          carro: ctx.carro?.nome, total_usd: ctx.carro?.total_usd
+        }
+      })
+    });
+    const data = await r.json();
+    const reply = data.reply || 'Pode repetir? 😊';
+    aiHistory.push({role:'assistant', content: reply});
+    await addMsg(reply.replace(/\n/g,'<br>'));
+
+    // Se não tem cotação ainda, oferecer
+    if (!ctx.nome && aiHistory.length >= 4) {
+      await addMsg('Quer que eu faça uma cotação completa para você? É super rápido! 😊');
+      addEl(makeOpts([{label:'💰 Sim, quero cotar!', fn: stepLead, full:true, bold:true}]));
+    }
+  } catch(e) {
+    await addMsg('Opa, tive uma dificuldade técnica. Pode repetir? 😊');
+  }
+}
+
+// START
+window.selecionarCarro = selecionarCarro;
+init();
+</script>
+</body>
+</html>
