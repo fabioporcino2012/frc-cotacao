@@ -131,6 +131,13 @@
     cursor:pointer;flex-shrink:0;font-size:20px;}
   .bar .send:active{opacity:.8;}
 
+
+  /* iOS safe area */
+  .bar{padding-bottom:calc(9px + env(safe-area-inset-bottom,0px));}
+  body{height:100svh;}
+  @supports (-webkit-touch-callout: none){
+    .chat{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px));}
+  }
   /* SPINNER */
   .spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
     border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;}
@@ -164,7 +171,7 @@ const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const LOCAIS = {1:'Orlando - Aeroporto (MCO)',3:'Miami - Aeroporto (MIA)',4:'Fort Lauderdale (FLL)'};
 
 const chat = document.getElementById('chat');
-let ctx = {nome:'',phone:'',email:'',local_id:1,local_nome:'',pickup:'',retorno:'',dias:7,carro:null,cotacao_id:null};
+let ctx = {nome:'',phone:'',email:'',local_id:1,local_nome:'',pickup:'',retorno:'',dias:7,carro:null,cotacao_id:null,mp_preference_id:null};
 let aiHistory = [];
 let aiActive = false;
 let sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2);
@@ -332,7 +339,7 @@ async function fetchCarros(pickup, ret, dias) {
       setTimeout(() => {
         const wrap = document.createElement('div');
         wrap.className = 'car-wrap msg in';
-        const totalBRL = (car.total_brl || car.daily_usd * dias * 5.8).toFixed(0);
+        const totalBRL = (car.total_brl || car.daily_usd * dias * CAMBIO_BRL).toFixed(0);
 
         wrap.innerHTML = `
           <div class="car-card${car.recommended?' rec':''}" onclick="selecionarCarro(${car.id})">
@@ -420,6 +427,7 @@ async function stepPagamento(moeda) {
     const totalBrl = car.total_brl || totalUsd * 5.8;
     const amount = moeda === 'usd' ? totalUsd : totalBrl;
 
+    let mpPrefId = null;
     const r = await fetch(`${EDGE}/hq-cotacao-payment`, {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -430,6 +438,7 @@ async function stepPagamento(moeda) {
       })
     });
     const data = await r.json();
+    if (data.preference_id) { ctx.mp_preference_id = data.preference_id; mpPrefId = data.preference_id; }
 
     if (!data.link) throw new Error('sem link');
 
@@ -501,6 +510,32 @@ async function sendUser() {
   await addMsg(text, 'out');
   aiHistory.push({role:'user', content: text});
 
+  // Detectar se cliente está avisando que pagou
+  const textLower = text.toLowerCase();
+  if (ctx.cotacao_id && ctx.mp_preference_id &&
+      (textLower.includes('pague') || textLower.includes('paguei') || textLower.includes('pago') ||
+       textLower.includes('transferi') || textLower.includes('fiz o pix') || textLower.includes('realizei'))) {
+    await showTyping(800);
+    await addMsg('Deixa eu verificar aqui... 🔍 <span class="spin"></span>');
+    try {
+      const vr = await fetch(EDGE + '/hq-cotacao-verificar-pag', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({cotacao_id: ctx.cotacao_id, preference_id: ctx.mp_preference_id})
+      });
+      const vd = await vr.json();
+      if (vd.pago) {
+        await addMsg('✅ <b>Pagamento confirmado!</b> Nossa equipe foi avisada e vai entrar em contato no seu WhatsApp em até 30 minutos para confirmar a reserva! 🏎️');
+        return;
+      } else {
+        await addMsg('Ainda não apareceu aqui... Aguarda mais alguns minutinhos e me avisa de novo. Se o pagamento foi aprovado vai aparecer logo! 😊');
+        return;
+      }
+    } catch(e) {
+      // continua para AI normal
+    }
+  }
+
+
   await showTyping(1000 + text.length * 15);
 
   try {
@@ -530,6 +565,15 @@ async function sendUser() {
   }
 }
 
+
+
+// Buscar câmbio real
+let CAMBIO_BRL = 5.80;
+fetch('https://abjzskmxfcqsxcoybsdg.supabase.co/rest/v1/frc_cambio_cache?id=eq.1&select=usd_brl', {
+  headers: {'apikey': ANON, 'Authorization': 'Bearer ' + ANON}
+}).then(r => r.json()).then(d => {
+  if (d && d[0] && d[0].usd_brl) CAMBIO_BRL = parseFloat(d[0].usd_brl);
+}).catch(() => {});
 
 // UTM tracking
 const _utmP = new URLSearchParams(window.location.search);
