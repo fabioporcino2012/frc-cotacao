@@ -569,6 +569,10 @@ window.selecionarCarro = async function (carId) {
     `✅ KM ilimitado · Seguro incluso`
   );
 
+  // Sincronizar seleção com contexto da Melissa
+  aiHistory.push({ role: 'user', content: `[Ação: selecionei o carro ${car.nome}]` });
+  aiHistory.push({ role: 'assistant', content: `[Sistema: ${car.nome} selecionado. Total: ${usd(car.total_usd)} / ${brl(totalBRL)}. Opções: Pagar USD, Pagar BRL, ou Ver outros carros.]` });
+
   // Salvar cotação em background
   fetch(`${EDGE}/hq-cotacao-engine?action=salvar`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -620,6 +624,9 @@ async function stepPagamento(moeda) {
     if (!data.link) throw new Error('sem link');
     window._lastPayLink  = data.link;
     window._lastPayMoeda = moeda;
+    // Sincronizar com contexto da Melissa
+    aiHistory.push({ role: 'user', content: `[Ação: cliquei em Pagar ${moeda.toUpperCase()}]` });
+    aiHistory.push({ role: 'assistant', content: `[Sistema: Link de pagamento ${moeda.toUpperCase()} gerado com sucesso: ${data.link}]` });
 
     // Atualizar mensagem de loading
     document.querySelectorAll('.bbl').forEach(b => {
@@ -791,11 +798,18 @@ async function sendUser() {
     aiHistory.push({ role: 'assistant', content: reply });
     await addMsg(`<div class="ai-b">🤖 Melissa</div><br>${renderMarkdown(reply)}`);
 
+    // Sempre mostrar botão WhatsApp após resposta da Melissa
+    const waQuick = document.createElement('div'); waQuick.className = 'opts';
+    const waBtn   = document.createElement('button');
+    waBtn.className = 'opt wa'; waBtn.style.cssText = 'font-size:12.5px;padding:8px 16px;';
+    waBtn.textContent = '💬 Falar com atendente agora';
+    waBtn.onclick = () => window.open(WA_LINK, '_blank');
+    waQuick.appendChild(waBtn); addEl(waQuick);
+
     // Após 4 trocas sem cotação, oferecer
     if (!ctx.carro && aiHistory.length >= 6) {
       addEl(makeOpts([
         { label: '💰 Fazer cotação agora', fn: stepDatas, full: true, bold: true },
-        { label: '💬 Falar com atendente', fn: () => window.open(WA_LINK, '_blank'), wa: true },
       ]));
     }
   } catch (e) {
