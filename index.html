@@ -223,9 +223,11 @@ let ctx = {
   pickup:'', retorno:'', dias: 7,
   carro: null, cotacao_id: null, mp_preference_id: null
 };
-let aiHistory    = [];
-let aiActive     = false;
-let leadCapturado = false;
+let aiHistory      = [];
+let aiActive       = false;
+let aiPending      = false;   // concurrency guard
+let leadCapturado  = false;
+let cotacaoSugerida = false;  // evita duplicar CTA
 let sessionId    = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2);
 window._cars     = {};
 
@@ -365,11 +367,30 @@ window.submitLead = async function () {
     const erroTel = validarTelefone(phone);
     if (erroTel) {
       const el = document.getElementById('f-fone');
-      el.classList.add('err');
-      el.placeholder = erroTel;
+      el.classList.add('err'); el.placeholder = erroTel;
       btn.disabled = false; btn.textContent = 'Continuar →'; return;
     }
     const phoneDigits = phone.replace(/\D/g, '');
+
+    // ── Twilio Lookup (silencioso se falhar, não bloqueia por timeout) ──
+    btn.textContent = 'Verificando número... 🔍';
+    try {
+      const vr = await Promise.race([
+        fetch(`${EDGE}/frc-phone-validate`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phoneDigits })
+        }),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000))
+      ]);
+      const vd = await vr.json();
+      if (!vd.valid && !vd.fallback) {
+        const el = document.getElementById('f-fone');
+        el.classList.add('err');
+        el.value = '';
+        el.placeholder = vd.error || 'Número inválido. Verifique o DDD.';
+        btn.disabled = false; btn.textContent = 'Continuar →'; return;
+      }
+    } catch (_) { /* timeout ou erro de rede — deixa passar */ }
 
     ctx.nome  = nome;
     ctx.phone = phoneDigits;
@@ -507,6 +528,10 @@ window.submitDatas = async function () {
 // STEP 3 — Lista de carros disponíveis
 // ═══════════════════════════════════════════════════════════════════════
 async function fetchCarros(pickup, ret, dias) {
+  // Limpar carros anteriores do DOM e do registro
+  document.querySelectorAll('.car-wrap').forEach(el => el.remove());
+  window._cars = {};
+
   try {
     const r    = await fetch(`${EDGE}/hq-cotacao-engine?action=availability&pickup=${pickup}&return=${ret}&location=${ctx.local_id}`);
     const data = await r.json();
@@ -571,6 +596,7 @@ window.selecionarCarro = async function (carId) {
   const car = window._cars[carId];
   if (!car) return;
   ctx.carro = car;
+  ctx.cotacao_id = null;  // reset para não usar cotacao_id de carro anterior
 
   document.querySelectorAll('.car-card').forEach(c => c.style.opacity = '.4');
 
@@ -750,16 +776,28 @@ async function startAI() {
 }
 
 function renderMarkdown(text) {
-  return text
-    .replace(/\*\*(https?:\/\/[^\s*<]+)\*\*/g, '<a href="$1" target="_blank" style="color:var(--green);font-weight:700;text-decoration:underline">🔗 Abrir link de pagamento</a>')
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" style="color:var(--green);font-weight:700">$1</a>')
-    .replace(/(https?:\/\/pay\.mercadopago[^\s<"]+)/g, '<a href="$1" target="_blank" style="color:var(--green);font-weight:700;text-decoration:underline">🔗 Abrir link de pagamento</a>')
-    .replace(/(https?:\/\/[^\s<"]+)/g, '<a href="$1" target="_blank" style="color:var(--green)">$1</a>')
-    .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+  // Passo 1: markdown explícito primeiro (**url** e [texto](url))
+  let r = text
+    .replace(/\*\*(https?:\/\/[^\s*<]+)\*\*/g, '<a href="$1" target="_blank" style="color:var(--green);font-weight:700">🔗 Abrir link de pagamento</a>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" style="color:var(--green);font-weight:700">$1</a>');
+  // Passo 2: linkificar URLs nuas APENAS em partes de texto (não dentro de tags HTML já criadas)
+  r = r.split(/(<[^>]+>)/).map((part, i) => {
+    if (i % 2 !== 0) return part; // tag HTML — não tocar
+    return part.replace(/(https?:\/\/[^\s<"]+)/g, url => {
+      const isMP = url.includes('mercadopago');
+      return isMP
+        ? `<a href="${url}" target="_blank" style="color:var(--green);font-weight:700;text-decoration:underline">🔗 Abrir link de pagamento</a>`
+        : `<a href="${url}" target="_blank" style="color:var(--green)">${url}</a>`;
+    });
+  }).join('');
+  // Passo 3: bold e quebras de linha
+  return r
+    .replace(/\*\*([^*<]+)\*\*/g, '<b>$1</b>')
     .replace(/\n/g, '<br>');
 }
 
 async function sendUser() {
+  if (aiPending) return;           // concurrency guard
   const inp  = document.getElementById('inp');
   const text = inp.value.trim();
   if (!text) return;
@@ -793,9 +831,13 @@ async function sendUser() {
     } catch (e) { /* continua para IA */ }
   }
 
+  aiPending = true;
   await showTyping(900 + text.length * 12);
 
   try {
+    // Cap aiHistory a 24 mensagens para controlar custo e contexto
+    if (aiHistory.length > 24) aiHistory = aiHistory.slice(-24);
+
     const r = await fetch(`${EDGE}/hq-cotacao-ai`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -818,16 +860,21 @@ async function sendUser() {
     aiHistory.push({ role: 'assistant', content: reply });
     await addMsg(`<div class="ai-b">🤖 Melissa</div><br>${renderMarkdown(reply)}`);
 
-    // Sempre mostrar botão WhatsApp após resposta da Melissa
-    const waQuick = document.createElement('div'); waQuick.className = 'opts';
-    const waBtn   = document.createElement('button');
-    waBtn.className = 'opt wa'; waBtn.style.cssText = 'font-size:12.5px;padding:8px 16px;';
-    waBtn.textContent = '💬 Falar com atendente agora';
-    waBtn.onclick = () => window.open(WA_LINK, '_blank');
-    waQuick.appendChild(waBtn); addEl(waQuick);
+    // WhatsApp CTA — só adicionar se o último elemento ainda não for um
+    const lastEl = chat.lastElementChild;
+    if (!lastEl?.classList.contains('wa-cta')) {
+      const waQuick = document.createElement('div');
+      waQuick.className = 'opts wa-cta';
+      const waBtn = document.createElement('button');
+      waBtn.className = 'opt wa'; waBtn.style.cssText = 'font-size:12.5px;padding:8px 16px;';
+      waBtn.textContent = '💬 Falar com atendente agora';
+      waBtn.onclick = () => window.open(WA_LINK, '_blank');
+      waQuick.appendChild(waBtn); addEl(waQuick);
+    }
 
-    // Após 4 trocas sem cotação, oferecer
-    if (!ctx.carro && aiHistory.length >= 6) {
+    // CTA cotação — só 1x por sessão
+    if (!ctx.carro && !cotacaoSugerida && aiHistory.length >= 6) {
+      cotacaoSugerida = true;
       addEl(makeOpts([
         { label: '💰 Fazer cotação agora', fn: stepDatas, full: true, bold: true },
       ]));
@@ -835,6 +882,8 @@ async function sendUser() {
   } catch (e) {
     await addMsg('Opa, tive uma dificuldade técnica. Pode repetir? Ou fale com nossa equipe! 😊');
     addEl(ctaFinalWhats());
+  } finally {
+    aiPending = false;  // libera concurrency guard
   }
 }
 
