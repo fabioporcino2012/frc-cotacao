@@ -618,6 +618,8 @@ async function stepPagamento(moeda) {
     const data = await r.json();
     if (data.preference_id) ctx.mp_preference_id = data.preference_id;
     if (!data.link) throw new Error('sem link');
+    window._lastPayLink  = data.link;
+    window._lastPayMoeda = moeda;
 
     // Atualizar mensagem de loading
     document.querySelectorAll('.bbl').forEach(b => {
@@ -720,6 +722,16 @@ async function startAI() {
   await addMsg(`<div class="ai-b">🤖 Melissa</div><br>Olá${ctx.nome ? ', <b>' + ctx.nome + '</b>' : ''}! 😊 Pode me perguntar tudo sobre nossos carros, coberturas, documentos, aeroportos... Estou aqui!`);
 }
 
+function renderMarkdown(text) {
+  return text
+    .replace(/\*\*(https?:\/\/[^\s*<]+)\*\*/g, '<a href="$1" target="_blank" style="color:var(--green);font-weight:700;text-decoration:underline">🔗 Abrir link de pagamento</a>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" style="color:var(--green);font-weight:700">$1</a>')
+    .replace(/(https?:\/\/pay\.mercadopago[^\s<"]+)/g, '<a href="$1" target="_blank" style="color:var(--green);font-weight:700;text-decoration:underline">🔗 Abrir link de pagamento</a>')
+    .replace(/(https?:\/\/[^\s<"]+)/g, '<a href="$1" target="_blank" style="color:var(--green)">$1</a>')
+    .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+    .replace(/\n/g, '<br>');
+}
+
 async function sendUser() {
   const inp  = document.getElementById('inp');
   const text = inp.value.trim();
@@ -762,9 +774,14 @@ async function sendUser() {
       body: JSON.stringify({
         messages: aiHistory,
         contexto: {
-          nome: ctx.nome, phone: ctx.phone, local_nome: ctx.local_nome,
+          nome: ctx.nome, phone: ctx.phone, email: ctx.email,
+          local_id: ctx.local_id, local_nome: ctx.local_nome,
           pickup: ctx.pickup, retorno: ctx.retorno, dias: ctx.dias,
-          carro: ctx.carro?.nome, total_usd: ctx.carro?.total_usd,
+          carro: ctx.carro?.nome, carro_id: ctx.carro?.id,
+          total_usd: ctx.carro?.total_usd, total_brl: ctx.carro?.total_brl,
+          cotacao_id: ctx.cotacao_id,
+          payment_link: window._lastPayLink || null,
+          payment_moeda: window._lastPayMoeda || null,
           tem_lead: leadCapturado
         }
       })
@@ -772,7 +789,7 @@ async function sendUser() {
     const data  = await r.json();
     const reply = data.reply || 'Pode repetir? 😊';
     aiHistory.push({ role: 'assistant', content: reply });
-    await addMsg(`<div class="ai-b">🤖 Melissa</div><br>${reply.replace(/\n/g, '<br>')}`);
+    await addMsg(`<div class="ai-b">🤖 Melissa</div><br>${renderMarkdown(reply)}`);
 
     // Após 4 trocas sem cotação, oferecer
     if (!ctx.carro && aiHistory.length >= 6) {
