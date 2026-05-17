@@ -326,14 +326,16 @@ async function fetchCarros(pickup, ret, dias) {
 
     await addMsg(`🎉 Encontrei <b>${carros.length} opções</b> disponíveis para você! Escolhe o que mais combina:`);
 
+    window._cars = window._cars || {};
     carros.forEach((car, i) => {
+      window._cars[car.id] = car;
       setTimeout(() => {
         const wrap = document.createElement('div');
         wrap.className = 'car-wrap msg in';
         const totalBRL = (car.total_brl || car.daily_usd * dias * 5.8).toFixed(0);
 
         wrap.innerHTML = `
-          <div class="car-card${car.recommended?' rec':''}" onclick="selecionarCarro(${JSON.stringify(JSON.stringify(car))})">
+          <div class="car-card${car.recommended?' rec':''}" onclick="selecionarCarro(${car.id})">
             ${car.recommended ? '<div class="car-badge">⭐ MAIS ESCOLHIDO</div>' : ''}
             <div class="car-img">
               <img src="${car.thumb_url || car.image_url}" onerror="this.parentNode.innerHTML='🚗'" loading="lazy"/>
@@ -372,8 +374,8 @@ async function fetchCarros(pickup, ret, dias) {
 }
 
 // STEP 4 — Selecionar carro
-async function selecionarCarro(carJson) {
-  const car = JSON.parse(carJson);
+async function selecionarCarro(carId) {
+  const car = (window._cars||{})[carId]; if(!car) return;
   ctx.carro = car;
 
   document.querySelectorAll('.car-card').forEach(c => c.style.opacity='.4');
@@ -528,8 +530,20 @@ async function sendUser() {
   }
 }
 
+
+// UTM tracking
+const _utmP = new URLSearchParams(window.location.search);
+const UTM = {
+  source: _utmP.get('utm_source') || 'direto',
+  medium: _utmP.get('utm_medium') || '',
+  campaign: _utmP.get('utm_campaign') || '',
+};
+if (UTM.source !== 'direto') sessionStorage.setItem('frc_utm', JSON.stringify(UTM));
+else { try { Object.assign(UTM, JSON.parse(sessionStorage.getItem('frc_utm')||'{}')); } catch(e){} }
+
 // START
 window.selecionarCarro = selecionarCarro;
+window._cars = {};
 init();
 </script>
 </body>
