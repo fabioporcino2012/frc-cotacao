@@ -330,6 +330,23 @@ function stepLead() {
   setTimeout(() => document.getElementById('f-nome')?.focus(), 300);
 }
 
+function validarTelefone(raw) {
+  const d = raw.replace(/\D/g, '');
+  if (d.length < 10) return 'Número muito curto — inclua o DDD.';
+  if (d.length > 13)  return 'Número muito longo.';
+  // Todos dígitos iguais: 00000000, 11111111, etc.
+  if (new Set(d).size === 1) return 'Número inválido.';
+  // Sequencial crescente ou decrescente nos primeiros 8 dígitos
+  const seg = d.slice(0, 8);
+  const crescente  = [...seg].every((c, i) => i === 0 || +c === (+seg[i-1] + 1) % 10);
+  const decrescente = [...seg].every((c, i) => i === 0 || +c === ((+seg[i-1] - 1 + 10) % 10));
+  if (crescente || decrescente) return 'Número inválido.';
+  // DDD inválido (Brasil: DDD vai de 11 a 99, não existe 00-10)
+  const ddd = parseInt(d.slice(0, 2));
+  if (ddd < 11) return 'DDD inválido — inclua o código de área (ex: 11 99999-0000).';
+  return null; // ✅ válido
+}
+
 window.submitLead = async function () {
   const btn = document.getElementById('btn-lead');
   if (!btn || btn.disabled) return;
@@ -345,11 +362,14 @@ window.submitLead = async function () {
       document.getElementById('f-nome').classList.add('err');
       btn.disabled = false; btn.textContent = 'Continuar →'; return;
     }
-    const phoneDigits = phone.replace(/\D/g, '');
-    if (phoneDigits.length < 8) {
-      document.getElementById('f-fone').classList.add('err');
+    const erroTel = validarTelefone(phone);
+    if (erroTel) {
+      const el = document.getElementById('f-fone');
+      el.classList.add('err');
+      el.placeholder = erroTel;
       btn.disabled = false; btn.textContent = 'Continuar →'; return;
     }
+    const phoneDigits = phone.replace(/\D/g, '');
 
     ctx.nome  = nome;
     ctx.phone = phoneDigits;
