@@ -220,6 +220,8 @@ const bar  = document.getElementById('bar');
 
 let ctx = {
   nome:'', phone:'', email:'',
+  hq_confirmado: false,   // true apenas após hq-step1-capture confirmar
+  kommo_lead_id: null,
   local_id: 1, local_nome: '',
   pickup:'', retorno:'', dias: 7,
   carro: null, cotacao_id: null, mp_preference_id: null
@@ -393,21 +395,34 @@ window.submitLead = async function () {
       }
     } catch (_) { /* timeout ou erro de rede — deixa passar */ }
 
+    // ── Registrar lead (SÍNCRONO — aguarda confirmação antes de liberar) ──
+    btn.textContent = 'Registrando lead... ✅';
+    let kommoLeadId = null;
+    try {
+      const capResp = await fetch(`${EDGE}/hq-step1-capture`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: nome, phone: phoneDigits, email,
+          source: 'chat_cotacao', attempt_uuid: sessionId,
+          utm_source: UTM.source, utm_medium: UTM.medium, utm_campaign: UTM.campaign
+        })
+      });
+      const capData = await capResp.json();
+      if (!capData.ok) {
+        // Edge retornou erro — não bloqueia, mas não confirma Kommo
+        console.warn('hq-step1-capture warn:', capData.error);
+      }
+      kommoLeadId = capData.kommo_lead_id || null;
+    } catch (_) { /* timeout de rede — continua mesmo assim */ }
+
+    // Lead confirmado somente após edge responder
     ctx.nome  = nome;
     ctx.phone = phoneDigits;
     ctx.email = email;
+    ctx.hq_confirmado = true;   // ← flag de confirmação backend
+    ctx.kommo_lead_id = kommoLeadId;
     leadCapturado = true;
-
-    // Salvar lead + Kommo em background
-    fetch(`${EDGE}/hq-step1-capture`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: nome, phone: phoneDigits, email,
-        source: 'chat_cotacao', attempt_uuid: sessionId,
-        utm_source: UTM.source, utm_medium: UTM.medium, utm_campaign: UTM.campaign
-      })
-    }).catch(() => {});
 
     document.getElementById('frm-lead')?.remove();
     await addMsg(`${nome} 📱 ${phone}`, 'out');
@@ -844,7 +859,9 @@ async function sendUser() {
       body: JSON.stringify({
         messages: aiHistory,
         contexto: {
-          nome: ctx.nome, phone: ctx.phone, email: ctx.email,
+          nome: ctx.hq_confirmado ? ctx.nome : null,
+          phone: ctx.hq_confirmado ? ctx.phone : null,
+          email: ctx.hq_confirmado ? ctx.email : null,
           local_id: ctx.local_id, local_nome: ctx.local_nome,
           pickup: ctx.pickup, retorno: ctx.retorno, dias: ctx.dias,
           carro: ctx.carro?.nome, carro_id: ctx.carro?.id,
@@ -852,7 +869,8 @@ async function sendUser() {
           cotacao_id: ctx.cotacao_id,
           payment_link: window._lastPayLink || null,
           payment_moeda: window._lastPayMoeda || null,
-          tem_lead: leadCapturado
+          tem_lead: leadCapturado,
+          hq_confirmado: ctx.hq_confirmado || false
         }
       })
     });
