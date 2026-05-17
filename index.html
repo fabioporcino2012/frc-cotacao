@@ -3,49 +3,50 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Florida Rental Car 🏎️</title>
+<title>Florida Rental Car — Cotação Online</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   :root{
     --bg:#111b21;--header:#1f2c34;--bubble-in:#202c33;--bubble-out:#005c4b;
     --green:#25d366;--text:#e9edef;--muted:#8696a0;--border:#2a3942;--red:#7D1202;
   }
+  html{background:#0b141a;min-height:100%;}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;
     background:var(--bg);height:100dvh;display:flex;flex-direction:column;
-    max-width:430px;margin:0 auto;position:relative;overflow:hidden;}
+    max-width:430px;margin:0 auto;position:relative;overflow:hidden;
+    box-shadow:0 0 60px rgba(0,0,0,.6);}
 
-  /* HEADER */
+  /* ── HEADER ──────────────────────────────────────────────────── */
   .hdr{background:var(--header);padding:10px 14px;display:flex;align-items:center;
     gap:10px;border-bottom:1px solid var(--border);z-index:20;flex-shrink:0;}
   .hdr-av{width:42px;height:42px;border-radius:50%;background:var(--red);
     display:flex;align-items:center;justify-content:center;
-    font-size:20px;color:#fff;font-weight:800;flex-shrink:0;}
-  .hdr-inf{flex:1;}
-  .hdr-name{color:var(--text);font-size:16px;font-weight:600;line-height:1.2;}
-  .hdr-status{color:var(--green);font-size:11.5px;}
-  .hdr-ic{color:var(--muted);font-size:22px;display:flex;gap:18px;cursor:pointer;}
+    font-size:18px;font-weight:800;flex-shrink:0;overflow:hidden;}
+  .hdr-av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+  .hdr-inf{flex:1;min-width:0;}
+  .hdr-name{color:var(--text);font-size:15.5px;font-weight:600;line-height:1.2;}
+  .hdr-status{color:var(--green);font-size:11px;}
+  .hdr-ic{display:flex;gap:16px;align-items:center;}
+  .hdr-ic a{color:var(--muted);text-decoration:none;display:flex;transition:.15s;}
+  .hdr-ic a:hover{color:var(--text);}
 
-  /* CHAT */
-  .chat{flex:1;overflow-y:auto;padding:10px 8px 72px;scroll-behavior:smooth;}
+  /* ── CHAT ────────────────────────────────────────────────────── */
+  .chat{flex:1;overflow-y:auto;padding:10px 8px 80px;scroll-behavior:smooth;}
   .chat::-webkit-scrollbar{display:none;}
 
-  .date-lbl{text-align:center;margin:10px 0;}
-  .date-lbl span{background:var(--header);color:var(--muted);
-    font-size:12px;padding:5px 14px;border-radius:8px;}
-
-  /* BUBBLES */
+  /* ── BUBBLES ─────────────────────────────────────────────────── */
   .msg{display:flex;margin:2px 0;animation:pop .25s ease;}
   @keyframes pop{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:none}}
   .msg.in{justify-content:flex-start;}
   .msg.out{justify-content:flex-end;}
-  .bbl{max-width:80%;padding:8px 10px 6px;border-radius:7.5px;
+  .bbl{max-width:82%;padding:8px 10px 6px;border-radius:7.5px;
     font-size:14.5px;line-height:1.45;position:relative;word-break:break-word;}
   .in .bbl{background:var(--bubble-in);color:var(--text);border-top-left-radius:0;}
   .out .bbl{background:var(--bubble-out);color:var(--text);border-top-right-radius:0;}
   .bbl b{font-weight:600;}
   .t{font-size:10.5px;color:var(--muted);float:right;margin-left:8px;margin-top:3px;}
 
-  /* TYPING */
+  /* ── TYPING ──────────────────────────────────────────────────── */
   .typing{display:flex;align-items:center;gap:4px;padding:12px 14px;
     background:var(--bubble-in);border-radius:7.5px;border-top-left-radius:0;
     width:56px;margin:2px 0;}
@@ -55,16 +56,16 @@
   .dot:nth-child(3){animation-delay:.4s;}
   @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
 
-  /* CAR CARD */
-  .car-wrap{max-width:82%;margin:3px 0;}
+  /* ── CAR CARD ────────────────────────────────────────────────── */
+  .car-wrap{max-width:84%;margin:3px 0;}
   .car-card{background:var(--bubble-in);border-radius:10px;overflow:hidden;
     border:1.5px solid var(--border);cursor:pointer;transition:.15s;}
   .car-card:hover,.car-card:active{border-color:var(--green);}
   .car-card.rec{border-color:var(--green);}
   .car-badge{background:var(--green);color:#111;font-size:11px;font-weight:800;
     padding:4px 10px;letter-spacing:.5px;}
-  .car-img{width:100%;height:130px;object-fit:cover;background:#1a2430;
-    display:flex;align-items:center;justify-content:center;font-size:48px;}
+  .car-img{width:100%;height:130px;background:#1a2430;
+    display:flex;align-items:center;justify-content:center;font-size:48px;overflow:hidden;}
   .car-img img{width:100%;height:100%;object-fit:cover;}
   .car-body{padding:10px 12px 12px;}
   .car-name{color:var(--text);font-size:15px;font-weight:700;}
@@ -77,7 +78,7 @@
     margin:10px 12px 12px;border:none;cursor:pointer;width:calc(100% - 24px);}
   .car-btn:active{opacity:.85;}
 
-  /* OPTIONS */
+  /* ── OPTIONS ─────────────────────────────────────────────────── */
   .opts{display:flex;flex-wrap:wrap;gap:8px;padding:6px 8px;}
   .opt{background:var(--header);border:1.5px solid var(--green);color:var(--green);
     padding:9px 16px;border-radius:20px;font-size:14px;cursor:pointer;
@@ -86,26 +87,31 @@
   .opt.full{width:100%;text-align:center;border-radius:10px;padding:13px;}
   .opt.bold{font-weight:800;font-size:15px;}
   .opt.wa{background:var(--green);color:#fff;border:none;font-weight:800;}
+  .opt.secondary{border-color:var(--muted);color:var(--muted);}
 
-  /* FORM */
+  /* ── FORM ────────────────────────────────────────────────────── */
   .frm{background:#1a2732;border-radius:10px;padding:14px;
-    max-width:88%;margin:4px 0;}
+    max-width:90%;margin:4px 0;}
   .frm label{color:var(--muted);font-size:12px;display:block;margin-bottom:4px;}
   .frm input,.frm select{width:100%;background:#2a3942;border:1.5px solid #3a4a56;
     border-radius:8px;padding:11px 14px;color:var(--text);font-size:15px;
-    outline:none;margin-bottom:10px;font-family:inherit;-webkit-appearance:none;}
+    outline:none;margin-bottom:10px;font-family:inherit;-webkit-appearance:none;
+    appearance:none;}
   .frm input:focus,.frm select:focus{border-color:var(--green);}
   .frm input::placeholder{color:var(--muted);}
   .frm .err{border-color:#ef4444!important;}
   .frm-btn{width:100%;background:var(--green);color:#111;border:none;
-    border-radius:8px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;}
+    border-radius:8px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;
+    transition:.15s;}
   .frm-btn:active{opacity:.85;}
+  .frm-btn:disabled{opacity:.55;cursor:not-allowed;}
 
-  /* PAYMENT */
+  /* ── PAYMENT CARD ────────────────────────────────────────────── */
   .pay-card{background:#0d1f14;border:2px solid var(--green);border-radius:14px;
-    padding:18px;max-width:88%;margin:4px 0;}
+    padding:18px;max-width:90%;margin:4px 0;}
   .pay-lbl{color:var(--green);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;}
-  .pay-total{color:var(--text);font-size:30px;font-weight:900;margin:4px 0;}
+  .pay-total{color:var(--text);font-size:30px;font-weight:900;margin:6px 0;}
+  .pay-sub{color:var(--muted);font-size:12.5px;margin-bottom:6px;}
   .pay-details{color:var(--muted);font-size:12.5px;line-height:1.8;}
   .pay-btn{display:block;width:100%;background:var(--green);color:#111;
     font-weight:800;font-size:16px;text-align:center;padding:15px;
@@ -113,15 +119,17 @@
   .pay-btn:active{opacity:.85;}
   .pay-security{color:var(--muted);font-size:11px;text-align:center;margin-top:8px;}
 
-  /* AI badge */
+  /* ── AI BADGE ────────────────────────────────────────────────── */
   .ai-b{display:inline-flex;align-items:center;gap:4px;
     background:#0d1b2a;border:1px solid #3b82f6;color:#60a5fa;
-    font-size:10px;padding:2px 7px;border-radius:10px;margin-bottom:5px;}
+    font-size:10px;padding:2px 8px;border-radius:10px;margin-bottom:5px;}
 
-  /* INPUT BAR */
+  /* ── INPUT BAR ───────────────────────────────────────────────── */
   .bar{position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;
     background:var(--header);padding:9px 12px;display:flex;align-items:flex-end;
-    gap:10px;border-top:1px solid var(--border);z-index:20;}
+    gap:10px;border-top:1px solid var(--border);z-index:20;
+    padding-bottom:calc(9px + env(safe-area-inset-bottom,0px));
+    transition:bottom .1s;}
   .bar textarea{flex:1;background:#2a3942;border:none;border-radius:21px;
     padding:10px 16px;color:var(--text);font-size:15px;outline:none;
     resize:none;min-height:42px;max-height:100px;font-family:inherit;line-height:1.4;}
@@ -131,33 +139,64 @@
     cursor:pointer;flex-shrink:0;font-size:20px;}
   .bar .send:active{opacity:.8;}
 
-
-  /* iOS safe area */
-  .bar{padding-bottom:calc(9px + env(safe-area-inset-bottom,0px));}
-  body{height:100svh;}
-  @supports (-webkit-touch-callout: none){
-    .chat{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px));}
+  /* ── iOS SAFE AREA ───────────────────────────────────────────── */
+  @supports (-webkit-touch-callout:none){
+    .chat{padding-bottom:calc(80px + env(safe-area-inset-bottom,0px));}
   }
-  /* SPINNER */
+
+  /* ── SPINNER ─────────────────────────────────────────────────── */
   .spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
     border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;}
   @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ── DESKTOP ─────────────────────────────────────────────────── */
+  @media(min-width:431px){
+    body{margin:20px auto;height:calc(100dvh - 40px);border-radius:12px;
+      overflow:hidden;}
+    .bar{border-radius:0 0 12px 12px;}
+    .chat{padding-bottom:90px;}
+  }
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-av">F</div>
+  <div class="hdr-av">
+    <img src="https://abjzskmxfcqsxcoybsdg.supabase.co/storage/v1/object/public/frc-assets/logo-frc-white.png"
+         onerror="this.outerHTML='🏎️'" loading="lazy"/>
+  </div>
   <div class="hdr-inf">
     <div class="hdr-name">Florida Rental Car 🏎️</div>
     <div class="hdr-status">● online agora</div>
   </div>
-  <div class="hdr-ic"><span>📞</span><span>⋮</span></div>
+  <div class="hdr-ic">
+    <!-- WhatsApp -->
+    <a href="https://wa.me/14074586695" target="_blank" title="WhatsApp">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+    </a>
+    <!-- Instagram -->
+    <a href="https://www.instagram.com/floridarentalcar/" target="_blank" title="Instagram">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+      </svg>
+    </a>
+    <!-- Site -->
+    <a href="https://floridarentalcar.com.br" target="_blank" title="Site FRC">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="2" y1="12" x2="22" y2="12"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+    </a>
+  </div>
 </div>
 
 <div class="chat" id="chat"></div>
 
-<div class="bar">
+<div class="bar" id="bar">
   <textarea id="inp" placeholder="Mensagem" rows="1"
     oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
     onkeypress="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendUser();}"></textarea>
@@ -165,31 +204,68 @@
 </div>
 
 <script>
-// ─── CONFIG ───────────────────────────────────────────────────────────
+// ─── CONFIG ────────────────────────────────────────────────────────────
 const EDGE = 'https://abjzskmxfcqsxcoybsdg.supabase.co/functions/v1';
 const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFianpza214ZmNxc3hjb3lic2RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODUzMDEsImV4cCI6MjA4OTk2MTMwMX0.66vI8Aqm9bzi8K9YW-pHGhSWr5ufoG_9i6jei2m9kAA';
-const LOCAIS = {1:'Orlando - Aeroporto (MCO)',3:'Miami - Aeroporto (MIA)',4:'Fort Lauderdale (FLL)'};
+const WA_LINK = 'https://wa.me/14074586695';
+const LOCAIS = {
+  1: 'Orlando — Aeroporto (MCO)',
+  3: 'Miami — Aeroporto (MIA)',
+  4: 'Fort Lauderdale (FLL)'
+};
 
 const chat = document.getElementById('chat');
-let ctx = {nome:'',phone:'',email:'',local_id:1,local_nome:'',pickup:'',retorno:'',dias:7,carro:null,cotacao_id:null,mp_preference_id:null};
-let aiHistory = [];
-let aiActive = false;
-let sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+const bar  = document.getElementById('bar');
 
-// ─── HELPERS ──────────────────────────────────────────────────────────
-const now = () => { const d=new Date(); return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0'); }
-const scroll = () => setTimeout(() => chat.scrollTop = chat.scrollHeight, 80);
+let ctx = {
+  nome:'', phone:'', email:'',
+  local_id: 1, local_nome: '',
+  pickup:'', retorno:'', dias: 7,
+  carro: null, cotacao_id: null, mp_preference_id: null
+};
+let aiHistory    = [];
+let aiActive     = false;
+let leadCapturado = false;
+let sessionId    = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+window._cars     = {};
 
-function addMsg(html, type='in', delay=0) {
+// ─── UTM ───────────────────────────────────────────────────────────────
+const _utmP = new URLSearchParams(window.location.search);
+const UTM = {
+  source:   _utmP.get('utm_source')   || 'direto',
+  medium:   _utmP.get('utm_medium')   || '',
+  campaign: _utmP.get('utm_campaign') || ''
+};
+if (UTM.source !== 'direto') sessionStorage.setItem('frc_utm', JSON.stringify(UTM));
+else { try { Object.assign(UTM, JSON.parse(sessionStorage.getItem('frc_utm') || '{}')); } catch(e){} }
+
+// ─── CÂMBIO ────────────────────────────────────────────────────────────
+let CAMBIO_BRL = 5.80;
+fetch(`https://abjzskmxfcqsxcoybsdg.supabase.co/rest/v1/frc_cambio_cache?id=eq.1&select=usd_brl`, {
+  headers: { apikey: ANON, Authorization: 'Bearer ' + ANON }
+}).then(r => r.json()).then(d => {
+  if (d?.[0]?.usd_brl) CAMBIO_BRL = parseFloat(d[0].usd_brl);
+}).catch(() => {});
+
+// ─── HELPERS ───────────────────────────────────────────────────────────
+const nowStr = () => {
+  const d = new Date();
+  return d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0');
+};
+const scroll = () => setTimeout(() => { chat.scrollTop = chat.scrollHeight; }, 80);
+const brl    = v => 'R$ ' + Number(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+const usd    = v => '$' + Number(v).toFixed(0);
+
+function addMsg(html, type = 'in', delay = 0) {
   return new Promise(r => setTimeout(() => {
     const d = document.createElement('div');
     d.className = `msg ${type}`;
-    d.innerHTML = `<div class="bbl">${html}<span class="t">${now()}${type==='out'?' ✓✓':''}</span></div>`;
+    d.innerHTML = `<div class="bbl">${html}<span class="t">${nowStr()}${type === 'out' ? ' ✓✓' : ''}</span></div>`;
     chat.appendChild(d); scroll(); r();
   }, delay));
 }
 
-function showTyping(ms=1200) {
+function showTyping(ms = 1200) {
   return new Promise(r => {
     const d = document.createElement('div');
     d.className = 'msg in'; d.id = 'typ';
@@ -205,7 +281,7 @@ function makeOpts(btns) {
   const d = document.createElement('div'); d.className = 'opts';
   btns.forEach(b => {
     const btn = document.createElement('button');
-    btn.className = 'opt' + (b.full?' full':'') + (b.bold?' bold':'') + (b.wa?' wa':'');
+    btn.className = 'opt' + (b.full ? ' full' : '') + (b.bold ? ' bold' : '') + (b.wa ? ' wa' : '') + (b.secondary ? ' secondary' : '');
     btn.textContent = b.label;
     btn.onclick = () => { d.remove(); b.fn(); };
     d.appendChild(btn);
@@ -213,381 +289,514 @@ function makeOpts(btns) {
   return d;
 }
 
-// ─── FLOW ─────────────────────────────────────────────────────────────
+function ctaFinalWhats(extra = []) {
+  return makeOpts([
+    ...extra,
+    { label: '💬 Falar com atendente agora', fn: () => window.open(WA_LINK, '_blank'), wa: true, full: true }
+  ]);
+}
+
+// ─── FLUXO PRINCIPAL ───────────────────────────────────────────────────
+
 async function init() {
-  await addMsg('Olá! 👋 Bem-vindo à <b>Florida Rental Car</b>!');
+  // Data label
+  const dl = document.createElement('div'); dl.className = 'date-lbl';
+  dl.innerHTML = `<span>Hoje · ${new Date().toLocaleDateString('pt-BR', {weekday:'long',day:'numeric',month:'long'})}</span>`;
+  addEl(dl);
+
+  await addMsg('Olá! 👋 Bem-vindo à <b>Florida Rental Car</b>! 🏎️');
   await showTyping(800);
-  await addMsg('🏎️ Somos especialistas em aluguel de carros em <b>Orlando, Miami e Fort Lauderdale</b> com suporte 100% em português.<br><br>Como posso te ajudar hoje?');
+  await addMsg('Somos especialistas em aluguel de carros em <b>Orlando, Miami e Fort Lauderdale</b> com suporte 100% em português 🇧🇷<br><br>Para te ajudar melhor, me conta seu nome e WhatsApp! 😊');
+  stepLead();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// STEP 1 — Captura de lead (OBRIGATÓRIO em todos os fluxos)
+// ═══════════════════════════════════════════════════════════════════════
+function stepLead() {
+  const frm = document.createElement('div'); frm.className = 'frm';
+  frm.id = 'frm-lead';
+  frm.innerHTML = `
+    <label>Seu nome *</label>
+    <input id="f-nome" type="text" placeholder="Ex: João Silva" autocomplete="name" inputmode="text"/>
+    <label>WhatsApp com DDD *</label>
+    <input id="f-fone" type="tel" placeholder="11 99999-0000" autocomplete="tel" inputmode="tel"/>
+    <label>E-mail (opcional)</label>
+    <input id="f-email" type="email" placeholder="joao@email.com" autocomplete="email" inputmode="email"/>
+    <button class="frm-btn" id="btn-lead" onclick="window.submitLead()">Continuar →</button>
+  `;
+  addEl(frm);
+  // Focus no nome após render
+  setTimeout(() => document.getElementById('f-nome')?.focus(), 300);
+}
+
+window.submitLead = async function () {
+  const btn = document.getElementById('btn-lead');
+  if (!btn || btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = 'Salvando...';
+
+  try {
+    const nome  = (document.getElementById('f-nome')?.value  || '').trim();
+    const phone = (document.getElementById('f-fone')?.value  || '').trim();
+    const email = (document.getElementById('f-email')?.value || '').trim();
+
+    if (!nome) {
+      document.getElementById('f-nome').classList.add('err');
+      btn.disabled = false; btn.textContent = 'Continuar →'; return;
+    }
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (phoneDigits.length < 8) {
+      document.getElementById('f-fone').classList.add('err');
+      btn.disabled = false; btn.textContent = 'Continuar →'; return;
+    }
+
+    ctx.nome  = nome;
+    ctx.phone = phoneDigits;
+    ctx.email = email;
+    leadCapturado = true;
+
+    // Salvar lead + Kommo em background
+    fetch(`${EDGE}/hq-step1-capture`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: nome, phone: phoneDigits, email,
+        source: 'chat_cotacao', attempt_uuid: sessionId,
+        utm_source: UTM.source, utm_medium: UTM.medium, utm_campaign: UTM.campaign
+      })
+    }).catch(() => {});
+
+    document.getElementById('frm-lead')?.remove();
+    await addMsg(`${nome} 📱 ${phone}`, 'out');
+    await showTyping(900);
+    await addMsg(`Prazer, <b>${nome}</b>! 🙌 Como posso te ajudar hoje?`);
+    showMenu();
+
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Continuar →';
+    await addMsg('Algo deu errado. Pode tentar de novo? 😊');
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════
+// MENU PRINCIPAL
+// ═══════════════════════════════════════════════════════════════════════
+function showMenu() {
   addEl(makeOpts([
-    {label:'💰 Fazer uma cotação', fn: stepLead, full:true, bold:true},
-    {label:'❓ Tenho uma dúvida', fn: startAI},
-    {label:'🎁 Promoções', fn: showPromo},
+    { label: '💰 Fazer uma cotação',           fn: stepDatas,  full: true, bold: true },
+    { label: '🎁 Ver promoções',               fn: showPromo },
+    { label: '🤖 Falar com Melissa (IA)',      fn: startAI },
+    { label: '💬 Falar com atendente agora',   fn: () => window.open(WA_LINK, '_blank'), wa: true, full: true },
   ]));
 }
 
-// STEP 1 — Lead capture
-async function stepLead() {
-  await addMsg('💰 Quero fazer uma cotação', 'out');
-  await showTyping(900);
-  await addMsg('Ótimo! 😊 Para começar, me passa seus dados rapidinho — assim te envio a cotação por WhatsApp e e-mail também!');
-
-  const frm = document.createElement('div'); frm.className = 'frm';
-  frm.innerHTML = `
-    <label>Seu nome *</label>
-    <input id="f-nome" type="text" placeholder="Ex: João Silva" autocomplete="name"/>
-    <label>WhatsApp (com DDD) *</label>
-    <input id="f-fone" type="tel" placeholder="11 99999-0000" autocomplete="tel"/>
-    <label>E-mail (para receber o PDF)</label>
-    <input id="f-email" type="email" placeholder="joao@email.com" autocomplete="email"/>
-    <button class="frm-btn" id="btn-lead">Continuar →</button>
-  `;
-  addEl(frm);
-  document.getElementById('btn-lead').onclick = submitLead;
-}
-
-async function submitLead() {
-  const nome = document.getElementById('f-nome').value.trim();
-  const phone = document.getElementById('f-fone').value.trim();
-  const email = document.getElementById('f-email').value.trim();
-  if (!nome) { document.getElementById('f-nome').classList.add('err'); return; }
-  if (!phone || phone.replace(/\D/g,'').length < 8) { document.getElementById('f-fone').classList.add('err'); return; }
-
-  ctx.nome = nome; ctx.phone = phone.replace(/\D/g,''); ctx.email = email;
-
-  // Salvar lead em background
-  fetch(`${EDGE}/hq-step1-capture`, {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({name:nome, phone:ctx.phone, email, source:'chat_cotacao', attempt_uuid: sessionId})
-  }).catch(()=>{});
-
-  document.querySelector('.frm')?.remove();
-  await addMsg(`Meu nome é <b>${nome}</b> 📱 ${phone}`, 'out');
-  await showTyping(1000);
-  await addMsg(`Prazer, <b>${nome}</b>! 🙌 Agora me conta: para <b>quando</b> é a viagem e onde vai <b>retirar o carro</b>?`);
-  stepDatas();
-}
-
-// STEP 2 — Datas
+// ═══════════════════════════════════════════════════════════════════════
+// STEP 2 — Datas e local de retirada
+// ═══════════════════════════════════════════════════════════════════════
 function stepDatas() {
-  const hoje = new Date();
-  const pickup = new Date(hoje); pickup.setDate(pickup.getDate()+14);
-  const ret = new Date(pickup); ret.setDate(ret.getDate()+7);
-  const fmt = d => d.toISOString().split('T')[0];
+  const hoje   = new Date();
+  const pickup = new Date(hoje); pickup.setDate(pickup.getDate() + 14);
+  const ret    = new Date(pickup); ret.setDate(ret.getDate() + 7);
+  const fmt    = d => d.toISOString().split('T')[0];
+  const minRet = new Date(hoje); minRet.setDate(hoje.getDate() + 1);
 
-  const frm = document.createElement('div'); frm.className = 'frm';
+  const frm = document.createElement('div'); frm.className = 'frm'; frm.id = 'frm-datas';
   frm.innerHTML = `
     <label>📍 Local de retirada</label>
     <select id="f-local">
-      <option value="1">Orlando - Aeroporto (MCO)</option>
-      <option value="3">Miami - Aeroporto (MIA)</option>
+      <option value="1">Orlando — Aeroporto (MCO)</option>
+      <option value="3">Miami — Aeroporto (MIA)</option>
       <option value="4">Fort Lauderdale (FLL)</option>
     </select>
     <label>📅 Data de retirada *</label>
     <input id="f-pickup" type="date" value="${fmt(pickup)}" min="${fmt(hoje)}"/>
     <label>📅 Data de devolução *</label>
-    <input id="f-ret" type="date" value="${fmt(ret)}" min="${fmt(pickup)}"/>
-    <button class="frm-btn" id="btn-datas">🔍 Ver carros disponíveis</button>
+    <input id="f-ret" type="date" value="${fmt(ret)}" min="${fmt(minRet)}"/>
+    <button class="frm-btn" id="btn-datas" onclick="window.submitDatas()">🔍 Ver carros disponíveis</button>
   `;
   addEl(frm);
-  document.getElementById('btn-datas').onclick = submitDatas;
+
+  // Sincronizar min da devolução quando pickup muda
+  setTimeout(() => {
+    const fpEl = document.getElementById('f-pickup');
+    const frEl = document.getElementById('f-ret');
+    if (fpEl && frEl) {
+      fpEl.addEventListener('change', () => {
+        if (fpEl.value) {
+          const minD = new Date(fpEl.value); minD.setDate(minD.getDate() + 1);
+          frEl.min = minD.toISOString().split('T')[0];
+          if (frEl.value <= fpEl.value) {
+            minD.setDate(minD.getDate() + 6);
+            frEl.value = minD.toISOString().split('T')[0];
+          }
+        }
+      });
+    }
+  }, 100);
 }
 
-async function submitDatas() {
-  const localId = parseInt(document.getElementById('f-local').value);
-  const pickup = document.getElementById('f-pickup').value;
-  const ret = document.getElementById('f-ret').value;
-  if (!pickup || !ret) return;
+window.submitDatas = async function () {
+  const btn = document.getElementById('btn-datas');
+  if (!btn || btn.disabled) return;
+  btn.disabled = true; btn.textContent = '🔍 Buscando...';
 
-  const d1=new Date(pickup), d2=new Date(ret);
-  const dias = Math.round((d2-d1)/(1000*60*60*24));
-  if (dias < 1) { alert('Datas inválidas'); return; }
+  try {
+    const localId = parseInt(document.getElementById('f-local')?.value || '1');
+    const pickup  = document.getElementById('f-pickup')?.value;
+    const ret     = document.getElementById('f-ret')?.value;
 
-  ctx.local_id = localId; ctx.local_nome = LOCAIS[localId];
-  ctx.pickup = pickup; ctx.retorno = ret; ctx.dias = dias;
+    if (!pickup || !ret) {
+      btn.disabled = false; btn.textContent = '🔍 Ver carros disponíveis'; return;
+    }
 
-  document.querySelector('.frm')?.remove();
-  const pFmt = d1.toLocaleDateString('pt-BR');
-  const rFmt = d2.toLocaleDateString('pt-BR');
+    const d1   = new Date(pickup + 'T12:00:00');
+    const d2   = new Date(ret + 'T12:00:00');
+    const dias = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
 
-  await addMsg(`📍 ${ctx.local_nome}<br>📅 ${pFmt} → ${rFmt} (${dias} dias)`, 'out');
-  await showTyping(600);
-  await addMsg('Buscando disponibilidade em tempo real... 🔍');
-  await showTyping(2000);
+    if (dias < 1) {
+      alert('A devolução deve ser após a retirada.');
+      btn.disabled = false; btn.textContent = '🔍 Ver carros disponíveis'; return;
+    }
 
-  fetchCarros(pickup, ret, dias);
-}
+    ctx.local_id  = localId;
+    ctx.local_nome = LOCAIS[localId] || 'Orlando — MCO';
+    ctx.pickup    = pickup;
+    ctx.retorno   = ret;
+    ctx.dias      = dias;
 
-// STEP 3 — Carros
+    document.getElementById('frm-datas')?.remove();
+
+    const pFmt = d1.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const rFmt = d2.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    await addMsg(`📍 ${ctx.local_nome}<br>📅 ${pFmt} → ${rFmt} (${dias} dia${dias > 1 ? 's' : ''})`, 'out');
+    await showTyping(500);
+    await addMsg('Buscando disponibilidade em tempo real... 🔍');
+    await showTyping(1800);
+
+    fetchCarros(pickup, ret, dias);
+
+  } catch (e) {
+    btn.disabled = false; btn.textContent = '🔍 Ver carros disponíveis';
+    await addMsg('Tive um problema ao buscar. Pode tentar de novo? 😊');
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════
+// STEP 3 — Lista de carros disponíveis
+// ═══════════════════════════════════════════════════════════════════════
 async function fetchCarros(pickup, ret, dias) {
   try {
-    const r = await fetch(`${EDGE}/hq-cotacao-engine?action=availability&pickup=${pickup}&return=${ret}`);
+    const r    = await fetch(`${EDGE}/hq-cotacao-engine?action=availability&pickup=${pickup}&return=${ret}&location=${ctx.local_id}`);
     const data = await r.json();
-
     const carros = (data.carros || []).filter(c => c.daily_usd > 0);
 
     if (carros.length === 0) {
       await addMsg('😕 Não encontrei carros disponíveis para essas datas. Tente outras datas ou fale com nossa equipe!');
-      addEl(makeOpts([{label:'💬 Falar com atendente', fn: ()=>window.open('https://wa.link/8x8bbz'), wa:true, full:true}]));
+      addEl(ctaFinalWhats([
+        { label: '📅 Escolher outras datas', fn: stepDatas, full: true }
+      ]));
       return;
     }
 
-    await addMsg(`🎉 Encontrei <b>${carros.length} opções</b> disponíveis para você! Escolhe o que mais combina:`);
+    await addMsg(`🎉 <b>${carros.length} opções</b> disponíveis para você! Escolhe o seu:`);
 
-    window._cars = window._cars || {};
     carros.forEach((car, i) => {
       window._cars[car.id] = car;
       setTimeout(() => {
+        const totalBRL = (car.total_brl || car.daily_usd * dias * CAMBIO_BRL);
         const wrap = document.createElement('div');
         wrap.className = 'car-wrap msg in';
-        const totalBRL = (car.total_brl || car.daily_usd * dias * CAMBIO_BRL).toFixed(0);
-
         wrap.innerHTML = `
-          <div class="car-card${car.recommended?' rec':''}" onclick="selecionarCarro(${car.id})">
+          <div class="car-card${car.recommended ? ' rec' : ''}" onclick="window.selecionarCarro(${car.id})">
             ${car.recommended ? '<div class="car-badge">⭐ MAIS ESCOLHIDO</div>' : ''}
             <div class="car-img">
-              <img src="${car.thumb_url || car.image_url}" onerror="this.parentNode.innerHTML='🚗'" loading="lazy"/>
+              <img src="${car.thumb_url || car.image_url || ''}" onerror="this.parentNode.innerHTML='🚗'" loading="lazy"/>
             </div>
             <div class="car-body">
               <div class="car-name">${car.nome}</div>
-              <div class="car-icons">
-                ${car.seats?`👥 ${car.seats}  `:''}${car.bags?`💼 ${car.bags}  `:''}❄️  🚗
-              </div>
-              ${car.descricao ? `<div class="car-icons" style="margin-top:3px">${car.descricao.slice(0,80)}</div>` : ''}
-              <div class="car-price">$${car.daily_usd.toFixed(0)}<span>/dia</span></div>
-              <div class="car-total">Total ${dias} dias: <b style="color:var(--text)">$${car.total_usd.toFixed(0)} USD</b> · R$ ${totalBRL}</div>
+              <div class="car-icons">${car.seats ? `👥 ${car.seats}  ` : ''}${car.bags ? `💼 ${car.bags}  ` : ''}❄️  🚗</div>
+              ${car.descricao ? `<div class="car-icons" style="margin-top:3px">${car.descricao.slice(0, 80)}</div>` : ''}
+              <div class="car-price">${usd(car.daily_usd)}<span>/dia</span></div>
+              <div class="car-total">Total ${dias}d: <b style="color:var(--text)">${usd(car.total_usd)}</b> · ${brl(totalBRL)}</div>
               <button class="car-btn">Quero este →</button>
             </div>
-          </div>
-        `;
+          </div>`;
         addEl(wrap);
 
         if (i === carros.length - 1) {
           setTimeout(async () => {
-            const aiWrap = document.createElement('div');
-            aiWrap.className = 'msg in';
-            aiWrap.innerHTML = `<div class="bbl"><div class="ai-b">🤖 IA</div><br>Dúvida sobre os carros? Pode me perguntar! Também consigo verificar se tem promoção especial para você 😊<span class="t">${now()}</span></div>`;
-            addEl(aiWrap);
+            const w = document.createElement('div'); w.className = 'msg in';
+            w.innerHTML = `<div class="bbl"><div class="ai-b">🤖 Melissa</div><br>Dúvidas sobre os carros? Me pergunte! Também posso verificar promoções 😊<span class="t">${nowStr()}</span></div>`;
+            addEl(w);
             aiActive = true;
-          }, 400);
+          }, 300);
         }
-      }, i * 700);
+      }, i * 650);
     });
 
-  } catch(e) {
-    console.error(e);
-    await addMsg('Encontrei uma dificuldade técnica. Que tal falar diretamente com nossa equipe? 😊');
-    addEl(makeOpts([{label:'💬 Falar com atendente', fn: ()=>window.open('https://wa.link/8x8bbz'), wa:true, full:true}]));
+  } catch (e) {
+    await addMsg('Não consegui buscar os carros agora. Nossa equipe pode te ajudar diretamente!');
+    addEl(ctaFinalWhats([
+      { label: '📅 Tentar outras datas', fn: stepDatas, full: true }
+    ]));
   }
 }
 
-// STEP 4 — Selecionar carro
-async function selecionarCarro(carId) {
-  const car = (window._cars||{})[carId]; if(!car) return;
+// ═══════════════════════════════════════════════════════════════════════
+// STEP 4 — Seleção de carro
+// ═══════════════════════════════════════════════════════════════════════
+window.selecionarCarro = async function (carId) {
+  const car = window._cars[carId];
+  if (!car) return;
   ctx.carro = car;
 
-  document.querySelectorAll('.car-card').forEach(c => c.style.opacity='.4');
+  document.querySelectorAll('.car-card').forEach(c => c.style.opacity = '.4');
+
+  const totalBRL = car.total_brl || car.total_usd * CAMBIO_BRL;
 
   await addMsg(`✅ Quero o <b>${car.nome}</b>!`, 'out');
-  await showTyping(1100);
-  await addMsg(`Excelente escolha! 🙌<br><br>📋 <b>Resumo da sua cotação:</b><br>🚗 ${car.nome}<br>📍 ${ctx.local_nome}<br>📅 ${new Date(ctx.pickup).toLocaleDateString('pt-BR')} → ${new Date(ctx.retorno).toLocaleDateString('pt-BR')}<br>⏱️ ${ctx.dias} dias<br>💵 <b>$${car.total_usd.toFixed(0)} USD</b> · R$ ${(car.total_brl||car.total_usd*5.8).toFixed(0)}<br>✅ KM ilimitado · Seguro incluso`);
+  await showTyping(1000);
+  await addMsg(
+    `Excelente escolha! 🙌<br><br>` +
+    `📋 <b>Resumo da cotação:</b><br>` +
+    `🚗 ${car.nome}<br>` +
+    `📍 ${ctx.local_nome}<br>` +
+    `📅 ${new Date(ctx.pickup+'T12:00:00').toLocaleDateString('pt-BR')} → ${new Date(ctx.retorno+'T12:00:00').toLocaleDateString('pt-BR')}<br>` +
+    `⏱️ ${ctx.dias} dia${ctx.dias > 1 ? 's' : ''}<br>` +
+    `💵 <b>${usd(car.total_usd)}</b> · ${brl(totalBRL)}<br>` +
+    `✅ KM ilimitado · Seguro incluso`
+  );
 
-  // Salvar cotação
+  // Salvar cotação em background
   fetch(`${EDGE}/hq-cotacao-engine?action=salvar`, {
-    method:'POST', headers:{'Content-Type':'application/json'},
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       session_id: sessionId, nome: ctx.nome, phone: ctx.phone, email: ctx.email,
       local_id: ctx.local_id, local_nome: ctx.local_nome,
       pickup_date: ctx.pickup, return_date: ctx.retorno, dias: ctx.dias,
       vehicle_class_id: car.id, vehicle_nome: car.nome,
       daily_usd: car.daily_usd, total_usd: car.total_usd,
-      total_brl: car.total_brl || car.total_usd * 5.8
+      total_brl: totalBRL, utm_source: UTM.source
     })
-  }).then(r=>r.json()).then(d => { if(d.cotacao_id) ctx.cotacao_id = d.cotacao_id; });
+  }).then(r => r.json()).then(d => { if (d.cotacao_id) ctx.cotacao_id = d.cotacao_id; }).catch(() => {});
 
-  await showTyping(800);
-  await addMsg('Como prefere prosseguir? 👇');
+  await showTyping(700);
+  await addMsg('Como quer prosseguir? 👇');
 
   addEl(makeOpts([
-    {label:`💳 Pagar em USD ($${car.total_usd.toFixed(0)})`, fn: ()=>stepPagamento('usd'), full:true, bold:true},
-    {label:`🇧🇷 Pagar em BRL (R$ ${(car.total_brl||car.total_usd*5.8).toFixed(0)})`, fn: ()=>stepPagamento('brl'), full:true},
-    {label:'📄 Receber cotação por e-mail', fn: stepPDF},
-    {label:'💬 Falar com vendedor', fn: ()=>window.open('https://wa.link/8x8bbz'), wa:true, full:true},
+    { label: `💳 Pagar em USD (${usd(car.total_usd)})`,    fn: () => stepPagamento('usd'), full: true, bold: true },
+    { label: `🇧🇷 Pagar em BRL (${brl(totalBRL)})`,        fn: () => stepPagamento('brl'), full: true },
+    { label: '📧 Receber cotação por e-mail',              fn: stepEmail },
+    { label: '🔍 Ver outros carros',                       fn: () => fetchCarros(ctx.pickup, ctx.retorno, ctx.dias) },
+    { label: '💬 Falar com atendente',                     fn: () => window.open(WA_LINK, '_blank'), wa: true, full: true },
   ]));
-}
+};
 
-// STEP 5 — Pagamento
+// ═══════════════════════════════════════════════════════════════════════
+// STEP 5A — Pagamento
+// ═══════════════════════════════════════════════════════════════════════
 async function stepPagamento(moeda) {
-  await addMsg(`💳 Pagar em ${moeda.toUpperCase()}`, 'out');
-  await showTyping(500);
-  await addMsg('Gerando seu link seguro... 🔐 <span class="spin"></span>');
+  await addMsg(`💳 Quero pagar em ${moeda.toUpperCase()}`, 'out');
+  await showTyping(400);
+  await addMsg('Gerando link seguro... 🔐 <span class="spin"></span>');
 
   try {
-    const car = ctx.carro;
-    const totalUsd = car.total_usd;
-    const totalBrl = car.total_brl || totalUsd * 5.8;
-    const amount = moeda === 'usd' ? totalUsd : totalBrl;
+    const car      = ctx.carro;
+    const totalBRL = car.total_brl || car.total_usd * CAMBIO_BRL;
 
-    let mpPrefId = null;
     const r = await fetch(`${EDGE}/hq-cotacao-payment`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        cotacao_id: ctx.cotacao_id, nome: ctx.nome, email: ctx.email,
-        phone: ctx.phone, vehicle_nome: car.nome, total_usd: totalUsd,
-        total_brl: totalBrl, dias: ctx.dias, moeda,
-        pickup_date: ctx.pickup, return_date: ctx.retorno, local_nome: ctx.local_nome
+        cotacao_id: ctx.cotacao_id, nome: ctx.nome, email: ctx.email, phone: ctx.phone,
+        vehicle_nome: car.nome, total_usd: car.total_usd, total_brl: totalBRL,
+        dias: ctx.dias, moeda, pickup_date: ctx.pickup, return_date: ctx.retorno,
+        local_nome: ctx.local_nome
       })
     });
     const data = await r.json();
-    if (data.preference_id) { ctx.mp_preference_id = data.preference_id; mpPrefId = data.preference_id; }
-
+    if (data.preference_id) ctx.mp_preference_id = data.preference_id;
     if (!data.link) throw new Error('sem link');
 
-    // Remover spinner
+    // Atualizar mensagem de loading
     document.querySelectorAll('.bbl').forEach(b => {
-      if(b.textContent.includes('Gerando')) b.innerHTML = '🔐 Link de pagamento gerado!<span class="t">'+now()+'</span>';
+      if (b.textContent.includes('Gerando link'))
+        b.innerHTML = `🔐 Link de pagamento gerado!<span class="t">${nowStr()}</span>`;
     });
 
-    const card = document.createElement('div');
-    card.className = 'pay-card';
+    const valor  = moeda === 'usd' ? usd(car.total_usd) + ' USD' : brl(totalBRL);
+    const metodo = moeda === 'brl' ? 'Pix ou até <b>10x sem juros</b>' : 'Cartão de crédito (USD)';
+    const gateway = moeda === 'brl' ? 'Mercado Pago' : 'Stripe';
+
+    const card = document.createElement('div'); card.className = 'pay-card';
     card.innerHTML = `
-      <div class="pay-lbl">🔐 Pagamento Seguro · Mercado Pago</div>
-      <div class="pay-total">${moeda==='usd'?'$'+totalUsd.toFixed(0):'R$ '+totalBrl.toFixed(0)}</div>
+      <div class="pay-lbl">🔐 Pagamento Seguro · ${gateway}</div>
+      <div class="pay-total">${valor}</div>
+      <div class="pay-sub">${metodo}</div>
       <div class="pay-details">
         🚗 ${car.nome}<br>
         📍 ${ctx.local_nome}<br>
-        📅 ${new Date(ctx.pickup).toLocaleDateString('pt-BR')} → ${new Date(ctx.retorno).toLocaleDateString('pt-BR')}<br>
+        📅 ${new Date(ctx.pickup+'T12:00:00').toLocaleDateString('pt-BR')} → ${new Date(ctx.retorno+'T12:00:00').toLocaleDateString('pt-BR')}<br>
         ⏱️ ${ctx.dias} dias · ✅ KM ilimitado · Seguro incluso
       </div>
       <button class="pay-btn" onclick="window.open('${data.link}','_blank')">
-        ${moeda==='usd'?'💳 Pagar com cartão USD':'🇧🇷 Pagar via Pix ou Cartão BRL'}
+        ${moeda === 'usd' ? '💳 Pagar com cartão USD' : '🇧🇷 Pagar via Pix ou Cartão'}
       </button>
-      <div class="pay-security">🔒 Pagamento 100% seguro · Mercado Pago</div>
+      <div class="pay-security">🔒 100% seguro · Criptografado</div>
     `;
     addEl(card);
 
-    await addMsg('✅ Após o pagamento, nossa equipe entra em contato em até <b>30 minutos</b> para confirmar sua reserva! 🏎️<br><br>Qualquer dúvida, pode me perguntar aqui 😊');
+    await addMsg('✅ Após o pagamento, nossa equipe entra em contato em até <b>30 min</b> pelo seu WhatsApp para confirmar a reserva! 🏎️');
+    await showTyping(500);
+    await addMsg('Já pagou? Me avisa aqui! 👇 Ou fale com a equipe pelo WhatsApp.');
+    addEl(ctaFinalWhats());
 
-  } catch(e) {
-    await addMsg('😕 Tive um problema técnico. Fale diretamente com nossa equipe!');
-    addEl(makeOpts([{label:'💬 Falar agora no WhatsApp', fn: ()=>window.open('https://wa.link/8x8bbz'), wa:true, full:true}]));
+  } catch (e) {
+    document.querySelectorAll('.bbl').forEach(b => {
+      if (b.textContent.includes('Gerando link'))
+        b.innerHTML = `😕 Não consegui gerar o link agora.<span class="t">${nowStr()}</span>`;
+    });
+    await addMsg('Nossa equipe vai te enviar o link de pagamento direto no WhatsApp! 😊');
+    addEl(ctaFinalWhats([
+      { label: '🔄 Tentar novamente', fn: () => stepPagamento(moeda), full: true, secondary: true }
+    ]));
   }
 }
 
-// STEP 5B — PDF
-async function stepPDF() {
-  await addMsg('📄 Quero receber a cotação por e-mail', 'out');
-  await showTyping(1200);
-  const car = ctx.carro;
-  await addMsg(`Cotação enviada para <b>${ctx.email||'seu e-mail'}</b> 📧<br><br>Nossa equipe também vai te chamar no <b>WhatsApp ${ctx.phone}</b> em breve! 😊<br><br>Posso te ajudar em mais alguma coisa?`);
+// ═══════════════════════════════════════════════════════════════════════
+// STEP 5B — Cotação por e-mail (sem falsa promessa de PDF)
+// ═══════════════════════════════════════════════════════════════════════
+async function stepEmail() {
+  await addMsg('📧 Quero receber a cotação', 'out');
+  await showTyping(1000);
+
+  const car      = ctx.carro;
+  const totalBRL = car.total_brl || car.total_usd * CAMBIO_BRL;
+
+  await addMsg(
+    `✅ Perfeito! Nossa equipe vai te enviar os detalhes completos pelo <b>WhatsApp ${ctx.phone}</b> em breve! 😊<br><br>` +
+    `📋 <b>Resumo:</b><br>` +
+    `🚗 ${car.nome}<br>📍 ${ctx.local_nome}<br>` +
+    `💵 ${usd(car.total_usd)} · ${brl(totalBRL)}<br>⏱️ ${ctx.dias} dias`
+  );
+  await showTyping(600);
+  await addMsg('Enquanto isso, quer garantir já o carro com pagamento? 👇');
+
   addEl(makeOpts([
-    {label:'💬 Falar com vendedor agora', fn: ()=>window.open('https://wa.link/8x8bbz'), wa:true, full:true},
-    {label:'💳 Pagar agora e garantir', fn: ()=>stepPagamento('brl'), full:true, bold:true},
+    { label: `💳 Garantir agora (${brl(totalBRL)})`, fn: () => stepPagamento('brl'), full: true, bold: true },
+    { label: `💳 Pagar em USD (${usd(car.total_usd)})`, fn: () => stepPagamento('usd'), full: true },
+    { label: '💬 Falar com atendente agora', fn: () => window.open(WA_LINK, '_blank'), wa: true, full: true },
+    { label: '🔍 Ver outros carros', fn: () => fetchCarros(ctx.pickup, ctx.retorno, ctx.dias), secondary: true, full: true },
   ]));
 }
 
+// ═══════════════════════════════════════════════════════════════════════
 // PROMOS
+// ═══════════════════════════════════════════════════════════════════════
 async function showPromo() {
-  await addMsg('🎁 Ver promoções', 'out');
+  await addMsg('🎁 Quero ver promoções', 'out');
   await showTyping(800);
-  await addMsg('🔥 <b>Promoção ativa:</b> até 30% OFF em todas as categorias!<br><br>Para ver o preço com desconto, preciso das suas datas. Vamos cotar?');
-  addEl(makeOpts([{label:'✅ Sim, quero cotar agora!', fn: stepLead, full:true, bold:true}]));
+  await addMsg(
+    '🔥 <b>Promoção ativa:</b> até 30% OFF em todas as categorias!<br><br>' +
+    '✅ KM ilimitado incluso<br>' +
+    '✅ Seguro básico incluso<br>' +
+    '✅ Parcelamento em até 10x sem juros (BRL)<br><br>' +
+    'Quer ver o preço real para as suas datas? 👇'
+  );
+  addEl(makeOpts([
+    { label: '✅ Sim! Ver preços com desconto', fn: stepDatas, full: true, bold: true },
+    { label: '💬 Falar com atendente', fn: () => window.open(WA_LINK, '_blank'), wa: true, full: true },
+  ]));
 }
 
-// AI MODE
+// ═══════════════════════════════════════════════════════════════════════
+// MELISSA — IA
+// ═══════════════════════════════════════════════════════════════════════
 async function startAI() {
   aiActive = true;
-  await addMsg('❓ Tenho uma dúvida', 'out');
+  await addMsg('🤖 Quero falar com a Melissa', 'out');
   await showTyping(700);
-  await addMsg('<div class="ai-b">🤖 IA</div><br>Claro! Pode me perguntar tudo sobre nossos carros, preços, seguros, documentos... Estou aqui pra ajudar! 😊');
+  await addMsg(`<div class="ai-b">🤖 Melissa</div><br>Olá${ctx.nome ? ', <b>' + ctx.nome + '</b>' : ''}! 😊 Pode me perguntar tudo sobre nossos carros, coberturas, documentos, aeroportos... Estou aqui!`);
 }
 
 async function sendUser() {
-  const inp = document.getElementById('inp');
+  const inp  = document.getElementById('inp');
   const text = inp.value.trim();
   if (!text) return;
   inp.value = ''; inp.style.height = 'auto';
 
   await addMsg(text, 'out');
-  aiHistory.push({role:'user', content: text});
+  aiHistory.push({ role: 'user', content: text });
 
-  // Detectar se cliente está avisando que pagou
-  const textLower = text.toLowerCase();
-  if (ctx.cotacao_id && ctx.mp_preference_id &&
-      (textLower.includes('pague') || textLower.includes('paguei') || textLower.includes('pago') ||
-       textLower.includes('transferi') || textLower.includes('fiz o pix') || textLower.includes('realizei'))) {
+  // Verificar pagamento
+  const tl = text.toLowerCase();
+  const pagouKeywords = ['paguei','pago','transferi','fiz o pix','realizei','efetuei','pix feito'];
+  if (ctx.cotacao_id && ctx.mp_preference_id && pagouKeywords.some(k => tl.includes(k))) {
     await showTyping(800);
-    await addMsg('Deixa eu verificar aqui... 🔍 <span class="spin"></span>');
+    await addMsg('Verificando seu pagamento... 🔍 <span class="spin"></span>');
     try {
-      const vr = await fetch(EDGE + '/hq-cotacao-verificar-pag', {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({cotacao_id: ctx.cotacao_id, preference_id: ctx.mp_preference_id})
+      const vr = await fetch(`${EDGE}/hq-cotacao-verificar-pag`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cotacao_id: ctx.cotacao_id, preference_id: ctx.mp_preference_id })
       });
       const vd = await vr.json();
+      document.querySelectorAll('.bbl').forEach(b => {
+        if (b.textContent.includes('Verificando')) b.innerHTML = `🔍 Verificando...<span class="t">${nowStr()}</span>`;
+      });
       if (vd.pago) {
-        await addMsg('✅ <b>Pagamento confirmado!</b> Nossa equipe foi avisada e vai entrar em contato no seu WhatsApp em até 30 minutos para confirmar a reserva! 🏎️');
-        return;
+        await addMsg('✅ <b>Pagamento confirmado!</b> Perfeito! 🎉<br>Nossa equipe já foi avisada e vai entrar em contato pelo seu WhatsApp em até 30 min para confirmar a reserva! 🏎️');
       } else {
-        await addMsg('Ainda não apareceu aqui... Aguarda mais alguns minutinhos e me avisa de novo. Se o pagamento foi aprovado vai aparecer logo! 😊');
-        return;
+        await addMsg('Ainda não apareceu na minha tela... Aguarda mais uns minutinhos e me avisa de novo. Se o Pix foi aprovado aparece logo! 😊');
+        addEl(ctaFinalWhats());
       }
-    } catch(e) {
-      // continua para AI normal
-    }
+      return;
+    } catch (e) { /* continua para IA */ }
   }
 
-
-  await showTyping(1000 + text.length * 15);
+  await showTyping(900 + text.length * 12);
 
   try {
     const r = await fetch(`${EDGE}/hq-cotacao-ai`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         messages: aiHistory,
         contexto: {
           nome: ctx.nome, phone: ctx.phone, local_nome: ctx.local_nome,
           pickup: ctx.pickup, retorno: ctx.retorno, dias: ctx.dias,
-          carro: ctx.carro?.nome, total_usd: ctx.carro?.total_usd
+          carro: ctx.carro?.nome, total_usd: ctx.carro?.total_usd,
+          tem_lead: leadCapturado
         }
       })
     });
-    const data = await r.json();
+    const data  = await r.json();
     const reply = data.reply || 'Pode repetir? 😊';
-    aiHistory.push({role:'assistant', content: reply});
-    await addMsg(reply.replace(/\n/g,'<br>'));
+    aiHistory.push({ role: 'assistant', content: reply });
+    await addMsg(`<div class="ai-b">🤖 Melissa</div><br>${reply.replace(/\n/g, '<br>')}`);
 
-    // Se não tem cotação ainda, oferecer
-    if (!ctx.nome && aiHistory.length >= 4) {
-      await addMsg('Quer que eu faça uma cotação completa para você? É super rápido! 😊');
-      addEl(makeOpts([{label:'💰 Sim, quero cotar!', fn: stepLead, full:true, bold:true}]));
+    // Após 4 trocas sem cotação, oferecer
+    if (!ctx.carro && aiHistory.length >= 6) {
+      addEl(makeOpts([
+        { label: '💰 Fazer cotação agora', fn: stepDatas, full: true, bold: true },
+        { label: '💬 Falar com atendente', fn: () => window.open(WA_LINK, '_blank'), wa: true },
+      ]));
     }
-  } catch(e) {
-    await addMsg('Opa, tive uma dificuldade técnica. Pode repetir? 😊');
+  } catch (e) {
+    await addMsg('Opa, tive uma dificuldade técnica. Pode repetir? Ou fale com nossa equipe! 😊');
+    addEl(ctaFinalWhats());
   }
 }
 
+// ─── iOS KEYBOARD FIX ─────────────────────────────────────────────────
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    const keyboardH = window.innerHeight - window.visualViewport.height;
+    bar.style.bottom = keyboardH > 50 ? keyboardH + 'px' : '0px';
+    scroll();
+  });
+}
 
-
-// Buscar câmbio real
-let CAMBIO_BRL = 5.80;
-fetch('https://abjzskmxfcqsxcoybsdg.supabase.co/rest/v1/frc_cambio_cache?id=eq.1&select=usd_brl', {
-  headers: {'apikey': ANON, 'Authorization': 'Bearer ' + ANON}
-}).then(r => r.json()).then(d => {
-  if (d && d[0] && d[0].usd_brl) CAMBIO_BRL = parseFloat(d[0].usd_brl);
-}).catch(() => {});
-
-// UTM tracking
-const _utmP = new URLSearchParams(window.location.search);
-const UTM = {
-  source: _utmP.get('utm_source') || 'direto',
-  medium: _utmP.get('utm_medium') || '',
-  campaign: _utmP.get('utm_campaign') || '',
-};
-if (UTM.source !== 'direto') sessionStorage.setItem('frc_utm', JSON.stringify(UTM));
-else { try { Object.assign(UTM, JSON.parse(sessionStorage.getItem('frc_utm')||'{}')); } catch(e){} }
-
-// START
-window.selecionarCarro = selecionarCarro;
-window._cars = {};
+// ─── START ─────────────────────────────────────────────────────────────
 init();
 </script>
 </body>
