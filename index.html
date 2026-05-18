@@ -814,6 +814,7 @@ function renderMarkdown(text) {
 
 async function sendUser() {
   if (aiPending) return;           // concurrency guard
+
   const inp  = document.getElementById('inp');
   const text = inp.value.trim();
   if (!text) return;
@@ -876,6 +877,18 @@ async function sendUser() {
     });
     const data  = await r.json();
     const reply = data.reply || 'Pode repetir? 😊';
+
+    // Melissa capturou lead via chat → atualizar ctx e remover form
+    if (data.capture_lead_result?.nome && !leadCapturado) {
+      const cap = data.capture_lead_result;
+      ctx.nome          = cap.nome  || ctx.nome;
+      ctx.phone         = cap.phone || ctx.phone;
+      ctx.kommo_lead_id = cap.kommo_lead_id || null;
+      ctx.hq_confirmado = true;
+      leadCapturado     = true;
+      document.getElementById('frm-lead')?.remove();
+    }
+
     aiHistory.push({ role: 'assistant', content: reply });
     await addMsg(`<div class="ai-b">🤖 Melissa</div><br>${renderMarkdown(reply)}`);
 
